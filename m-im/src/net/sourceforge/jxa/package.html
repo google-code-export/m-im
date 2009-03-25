@@ -1,0 +1,21 @@
+<body>
+<p>
+This package contains the XML-Reader and XML-Writer Class, the JXA API Class to communicate with a jabber server and the XmppListener Interface to get events.
+</p>
+<p>
+With {@link net.sourceforge.jxa.Jxa} (J2ME XMPP API) you can create an object for every session with a jabber
+server. On creation it will login with the given data to a given jabber host.
+You can specify the hostname/port of a jabber server, your username/password,
+the used resource and the priority of the connecting resource.
+</p>
+<p>
+When the object is created, you can use its public methods to get the roster,
+set your status, send a message, even do various subscription tasks. All
+events from the server to your client will be catched and you only have
+to implement the interface methodes of XmppListener and use the methode
+{@link net.sourceforge.jxa.Jxa#addListener(XmppListener xl)} to add an event listener.
+</p>
+<p>
+The main application/midlet that uses this API can be found in {@link jxac}
+</p>
+</body>
