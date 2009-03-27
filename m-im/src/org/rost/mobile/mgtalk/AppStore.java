@@ -15,7 +15,6 @@ import javax.microedition.media.Player;
 import javax.microedition.media.control.VolumeControl;
 import net.sourceforge.jxa.Jxa;
 import org.rost.mobile.guilib.core.GUIStore;
-import org.rost.mobile.mgtalk.controllers.NetworkDispatcher;
 import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.Profile;
 import org.rost.mobile.mgtalk.model.ProfileList;

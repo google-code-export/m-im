@@ -12,16 +12,12 @@ import java.util.Vector;
 import net.sourceforge.jxa.Jxa;
 import net.sourceforge.jxa.XmppAdapter;
 import org.rost.mobile.mgtalk.AppStore;
-import org.rost.mobile.mgtalk.controllers.NetworkDispatcher;
-import org.rost.mobile.mgtalk.ui.ContactListUI;
-import org.rost.mobile.mgtalk.utils.NetworkTools;
-import org.rost.mobile.mgtalk.utils.XmlNode;
 
 /**
  *
  * @author Kostya
  */
-public class SharedStatus extends XmppAdapter{
+public class SharedStatus extends XmppAdapter {
 
     /** Creates a new instance of SharedStatus */
     protected Vector onlineList = new Vector();
@@ -35,10 +31,12 @@ public class SharedStatus extends XmppAdapter{
 
     public void onSharedStatusEvent(String status, int show, Vector awayList, Vector busyList, Vector onlineList) {
         this.status = status;
-                if (!firstRefresh) {
+        if (!firstRefresh) {
             AppStore.getSelectedProfile().setStatus(status);
             AppStore.getSelectedProfile().setStatusID(show);
             AppStore.getSelectedProfile().setStatusActive(true);
+            
+        }else{
             refreshPresenceStatus();
         }
         firstRefresh = false;
@@ -62,8 +60,8 @@ public class SharedStatus extends XmppAdapter{
         }
         String to = AppStore.getSelectedProfile().getUserName();
         String show = Jxa.statusIDtoString(AppStore.getSelectedProfile().getStatusID());
-        AppStore.getJxa().sendShareStatus(to,status,show,onlineList,awayList,busyList);
-        
+        AppStore.getJxa().sendShareStatus(to, status, show, onlineList, awayList, busyList);
+
     }
 
     public boolean isFirstRefresh() {
@@ -99,7 +97,6 @@ public class SharedStatus extends XmppAdapter{
             awayList.insertElementAt(status, 0);
         }
     }
-
 
     public void refreshPresenceStatus() {
         final Profile selectedProfile = AppStore.getSelectedProfile();

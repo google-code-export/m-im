@@ -38,7 +38,7 @@ public class RadioGroup implements ItemActionListener {
     }
 
     public void setValue(int value) {
-        System.out.println("Value = " + value);
+        //System.out.println("Value = " + value);
         for (int i = 0; i < items.size(); i++) {
             CheckBoxItem item = (CheckBoxItem) items.elementAt(i);
             item.setSelected(value == i);

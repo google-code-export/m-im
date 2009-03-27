@@ -18,10 +18,8 @@ package net.sourceforge.jxa;
 import javax.microedition.io.*;
 import java.io.*;
 import java.util.*;
+import javax.microedition.pki.CertificateException;
 import org.rost.mobile.mgtalk.AppStore;
-import org.rost.mobile.mgtalk.model.Profile;
-import org.rost.mobile.mgtalk.model.SharedStatus;
-import org.rost.mobile.mgtalk.ui.ContactListUI;
 
 /**
  * J2ME XMPP API Class
@@ -41,8 +39,9 @@ public class Jxa extends Thread {
     private XmlWriter writer;
     private InputStream is;
     private OutputStream os;
-    private StreamConnection connection;
+    private SocketConnection connection;
     private Vector listeners = new Vector();
+    private String googleToken = "";
 
     /**
      * If you create this object all variables will be saved and the
@@ -132,25 +131,34 @@ public class Jxa extends Thread {
     public void run() {
         try {
             if (!use_ssl) {
-                connection = (StreamConnection) Connector.open("socket://" + this.host + ":" + this.port);
-                this.reader = new XmlReader(connection.openInputStream());
-                this.writer = new XmlWriter(connection.openOutputStream());
+                connection = (SocketConnection) Connector.open("socket://" + this.server + ":" + this.port, Connector.READ_WRITE);
+                connection.setSocketOption(SocketConnection.KEEPALIVE, 1);
+                is = connection.openInputStream();
+                os = connection.openOutputStream();
+
+                this.reader = new XmlReader(is);
+                this.writer = new XmlWriter(os);
             } else {
-                connection = (SecureConnection) Connector.open("ssl://" + this.server + ":" + this.port, Connector.READ_WRITE);
+                connection = (SocketConnection) Connector.open("ssl://" + this.server + ":" + this.port, Connector.READ_WRITE);
                 //sc.setSocketOption(SocketConnection.DELAY, 1);
                 //sc.setSocketOption(SocketConnection.LINGER, 0);
+                connection.setSocketOption(SocketConnection.KEEPALIVE, 1);
                 is = connection.openInputStream();
                 os = connection.openOutputStream();
                 this.reader = new XmlReader(is);
                 this.writer = new XmlWriter(os);
             }
+        } catch (final CertificateException ex) {
+            java.lang.System.out.println(ex);
+            this.connectionFailed(ex.getReason() + ex.getMessage());
+            return;
         } catch (final Exception e) {
-            java.lang.System.out.println(e);
-            this.connectionFailed(e.toString());
+            //java.lang.System.out.println(e);
+            this.connectionFailed(e.getMessage());
             return;
         }
 
-        java.lang.System.out.println("connected");
+        //java.lang.System.out.println("connected");
         /*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
         XmppListener xl = (XmppListener) enu.nextElement();
         xl.onDebug("connected");
@@ -174,7 +182,7 @@ public class Jxa extends Thread {
             io.printStackTrace();
             }*/
             // hier entsteht der connection failed bug (Network Down)
-            this.connectionFailed(e.toString());
+            this.connectionFailed(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -206,51 +214,77 @@ public class Jxa extends Thread {
      * @throws java.io.IOException is thrown if {@link XmlReader} or {@link XmlWriter}
      *	throw an IOException.
      */
-    public void login() throws IOException {
-        if (!use_ssl) {
-            // start stream
-            this.writer.startTag("stream:stream");
-            this.writer.attribute("to", this.host);
-            this.writer.attribute("xmlns", "jabber:client");
-            this.writer.attribute("xmlns:stream", "http://etherx.jabber.org/streams");
-            this.writer.flush();
-            // log in
-            this.writer.startTag("iq");
-            this.writer.attribute("type", "set");
-            this.writer.attribute("id", "auth");
-            this.writer.startTag("query");
-            this.writer.attribute("xmlns", "jabber:iq:auth");
+    public synchronized void login() throws IOException {
+        //if (!use_ssl) {
+        /*
+        // start stream
+        this.writer.startTag("stream:stream");
+        this.writer.attribute("to", this.host);
+        this.writer.attribute("xmlns", "jabber:client");
+        this.writer.attribute("xmlns:stream", "http://etherx.jabber.org/streams");
+        this.writer.flush();
+        // log in
+        this.writer.startTag("iq");
+        this.writer.attribute("type", "set");
+        this.writer.attribute("id", "auth");
+        this.writer.startTag("query");
+        this.writer.attribute("xmlns", "jabber:iq:auth");
 
-            this.writer.startTag("username");
-            this.writer.text(this.username);
-            this.writer.endTag();
-            this.writer.startTag("password");
-            this.writer.text(this.password);
-            this.writer.endTag();
-            this.writer.startTag("resource");
-            this.writer.text(this.resource);
-            this.writer.endTag();
+        this.writer.startTag("username");
+        this.writer.text(this.username);
+        this.writer.endTag();
+        this.writer.startTag("password");
+        this.writer.text(this.password);
+        this.writer.endTag();
+        this.writer.startTag("resource");
+        this.writer.text(this.resource);
+        this.writer.endTag();
 
-            this.writer.endTag(); // query
-            this.writer.endTag(); // iq
-            this.writer.flush();
-        } else {
-            String msg = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' to='" + this.host + "' version='1.0'>";
+        this.writer.endTag(); // query
+        this.writer.endTag(); // iq
+        this.writer.flush();
+         * */
+        //} else {
+        String msg = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' to='" + this.host + "' version='1.0'>";
+        os.write(msg.getBytes());
+        os.flush();
+        Vector mechanisms = new Vector();
+        do {
+            reader.next();
+            if (reader.getType() == reader.START_TAG &&
+                    "mechanisms".equals(reader.getName()) &&
+                    "urn:ietf:params:xml:ns:xmpp-sasl".equals(reader.getAttribute("xmlns"))) {
+                fillMechanisms(mechanisms);
+            }
+        } while (!(reader.getType() == XmlReader.END_TAG && reader.getName().equals("stream:features")));
+
+        //java.lang.System.out.println("SASL phase1");
+            /*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
+        XmppListener xl = (XmppListener) enu.nextElement();
+        xl.onDebug("SASL phase 1");
+        }*/
+
+        //int ghost = is.available();
+        //is.skip(ghost);
+        boolean loginSuccess = false;
+
+        if (mechanisms.contains("X-GOOGLE-TOKEN")) {
+            msg = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='X-GOOGLE-TOKEN'>";
+            msg = msg + generateTokenViaGoogle() + "</auth>";
             os.write(msg.getBytes());
             os.flush();
-            do {
-                reader.next();
-            } while ((reader.getType() != XmlReader.END_TAG) || (!reader.getName().equals("stream:features")));
-
-            java.lang.System.out.println("SASL phase1");
-            /*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
-            XmppListener xl = (XmppListener) enu.nextElement();
-            xl.onDebug("SASL phase 1");
-            }*/
-
-            //int ghost = is.available();
-            //is.skip(ghost);
-
+            reader.next();
+            if (reader.getName().equals("success")) {
+                loginSuccess = true;
+                while (true) {
+                    if ((reader.getType() == XmlReader.END_TAG) && reader.getName().equals("success")) {
+                        break;
+                    }
+                    reader.next();
+                }
+            }
+        }
+        if (mechanisms.contains("PLAIN") && loginSuccess == false) {
             msg = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
             byte[] auth_msg = (username + "@" + host + "\0" + username + "\0" + password).getBytes();
             msg = msg + Base64.encode(auth_msg) + "</auth>";
@@ -258,53 +292,68 @@ public class Jxa extends Thread {
             os.flush();
             reader.next();
             if (reader.getName().equals("success")) {
+                loginSuccess = true;
                 while (true) {
                     if ((reader.getType() == XmlReader.END_TAG) && reader.getName().equals("success")) {
                         break;
                     }
                     reader.next();
                 }
-            } else {
-                for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                    XmppListener xl = (XmppListener) e.nextElement();
-                    xl.onAuthFailed(reader.getName() + ", failed authentication");
-                }
-                return;
             }
-            java.lang.System.out.println("SASL phase2");
+        }
+
+        if (loginSuccess == false) {
+            for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
+                XmppListener xl = (XmppListener) e.nextElement();
+                xl.onAuthFailed(reader.getName() + ", failed authentication");
+            }
+            return;
+        }
+
+        //java.lang.System.out.println("SASL phase2");
             /*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
-            XmppListener xl = (XmppListener) enu.nextElement();
-            xl.onDebug("SASL phase 2");
-            }*/
-            msg = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' to='" + this.host + "' version='1.0'>";
-            os.write(msg.getBytes());
-            os.flush();
+        XmppListener xl = (XmppListener) enu.nextElement();
+        xl.onDebug("SASL phase 2");
+        }*/
+        msg = "<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' to='" + this.host + "' version='1.0'>";
+        os.write(msg.getBytes());
+        os.flush();
+        reader.next();
+        while (true) {
+            if ((reader.getType() == XmlReader.END_TAG) && reader.getName().equals("stream:features")) {
+                break;
+            }
             reader.next();
-            while (true) {
-                if ((reader.getType() == XmlReader.END_TAG) && reader.getName().equals("stream:features")) {
-                    break;
-                }
-                reader.next();
-            }
-            java.lang.System.out.println("SASL done");
+        }
+        //java.lang.System.out.println("SASL done");
             /*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
-            XmppListener xl = (XmppListener) enu.nextElement();
-            xl.onDebug("SASL done");
-            }	*/
-            if (resource == null) {
-                msg = "<iq type='set' id='res_binding'><bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/></iq>";
-            } else {
-                msg = "<iq type='set' id='res_binding'><bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" + resource + "</resource></bind></iq>";
+        XmppListener xl = (XmppListener) enu.nextElement();
+        xl.onDebug("SASL done");
+        }	*/
+        if (resource == null) {
+            msg = "<iq type='set' id='res_binding'><bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/></iq>";
+        } else {
+            msg = "<iq type='set' id='res_binding'><bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" + resource + "</resource></bind></iq>";
+        }
+        os.write(msg.getBytes());
+        os.flush();
+    //}
+    }
+
+    private void fillMechanisms(Vector mechanisms) {
+        try {
+            while (this.reader.next() == XmlReader.START_TAG) {
+                mechanisms.addElement(parseText());
             }
-            os.write(msg.getBytes());
-            os.flush();
+        } catch (IOException ex) {
+            this.connectionFailed(ex.getMessage());
         }
     }
 
     /**
      * Closes the stream-tag and the {@link XmlWriter}.
      */
-    public void logoff() {
+    public synchronized void logoff() {
         try {
             this.writer.endTag();
             this.writer.flush();
@@ -320,7 +369,7 @@ public class Jxa extends Thread {
      * @param to the JID of the recipient
      * @param msg the message itself
      */
-    public void sendMessage(final String to, final String msg) {
+    public synchronized void sendMessage(final String to, final String msg) {
         try {
             this.writer.startTag("message");
             this.writer.attribute("type", "chat");
@@ -332,11 +381,40 @@ public class Jxa extends Thread {
             this.writer.flush();
         } catch (final Exception e) {
             // e.printStackTrace();
-            this.connectionFailed();
+            this.connectionFailed(e.getMessage());
         }
     }
 
-    public void sendShareStatus(String to, String status, String show, Vector onlineList, Vector awayList, Vector busyList) {
+    public synchronized void sendGoogleSettings() {
+        try {
+            os.write(("<iq type=\"get\" id=\"6\"><query xmlns=\"google:relay\"/></iq>").getBytes());
+            os.flush();
+            os.write(("<iq type=\"set\" from=\"" + myjid + "/" + resource + "\" to=\"" + myjid + "\" id=\"user-setting\">" +
+                    "<usersetting xmlns=\"google:setting\"><autoacceptsuggestions value=\"false\"/>" +
+                    "<mailnotifications value=\"true\"/></usersetting></iq>").getBytes());
+            os.flush();
+            os.write(("<presence><show></show><status></status></presence>" +
+                    //"<iq type=\"get\"  from=\""+ myjid + "/" + resource +"\" to=\"" + myjid + "\" id=\"mm-get\">" +
+                    //"<query xmlns=\"google:mail:notify\" /></iq>" +
+                    "<iq type=\"get\" to=\"" + myjid + "\" id=\"ss-get\">" +
+                    "<query xmlns=\"google:shared-status\" version=\"2\" /></iq>").getBytes());
+            os.flush();
+
+        } catch (IOException ex) {
+            this.connectionFailed(ex.getMessage());
+        }
+    }
+
+    public synchronized void startSession() {
+        try {
+            os.write(("<iq to=\"" + host + "\" type=\"set\" id=\"sess_1\">" + "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/></iq>").getBytes());
+            os.flush();
+        } catch (IOException ex) {
+            this.connectionFailed(ex.getMessage());
+        }
+    }
+
+    public synchronized void sendShareStatus(String to, String status, String show, Vector onlineList, Vector awayList, Vector busyList) {
         try {
             /*sb.append("<iq type=\"set\" to=\"" + AppStore.getSelectedProfile().getUserName() + "\" id=\"ss-1\">" +
             "<query xmlns=\"google:shared-status\">" +
@@ -419,7 +497,7 @@ public class Jxa extends Thread {
      * subscription methods subscribe, unsubscribe, subscribed and
      * unsubscribed to change subscriptions.
      */
-    private void sendPresence(final String to, final String type, final String show, final String status, final int priority) {
+    private synchronized void sendPresence(final String to, final String type, final String show, final String status, final int priority) {
         try {
             this.writer.startTag("presence");
             if (type != null) {
@@ -459,14 +537,14 @@ public class Jxa extends Thread {
      * @param status an extended text describing the actual status
      * @param priority the priority number (5 should be default)
      */
-    public void setStatus(String show, String status, final int priority) {
+    public synchronized void setStatus(String show, String status, final int priority) {
         if (show.equals("")) {
             show = null;
         }
         if (status.equals("")) {
             status = null;
         }
-        if (show.equals("invisible")) {
+        if (show != null && show.equals("invisible")) {
             this.sendPresence(null, "invisible", null, null, priority);
         } else {
             this.sendPresence(null, null, show, status, priority);
@@ -478,7 +556,7 @@ public class Jxa extends Thread {
      *
      * @param to the jid you want to subscribe
      */
-    public void subscribe(final String to) {
+    public synchronized void subscribe(final String to) {
         this.sendPresence(to, "subscribe", null, null, 0);
     }
 
@@ -487,7 +565,7 @@ public class Jxa extends Thread {
      *
      * @param to the jid you want to remove your subscription
      */
-    public void unsubscribe(final String to) {
+    public synchronized void unsubscribe(final String to) {
         this.sendPresence(to, "unsubscribe", null, null, 0);
     }
 
@@ -496,7 +574,7 @@ public class Jxa extends Thread {
      *
      * @param to the jid that sent you a subscription request
      */
-    public void subscribed(final String to) {
+    public synchronized void subscribed(final String to) {
         this.sendPresence(to, "subscribed", null, null, 0);
     }
 
@@ -505,7 +583,7 @@ public class Jxa extends Thread {
      *
      * @param to the jid that sent you a subscription request
      */
-    public void unsubscribed(final String to) {
+    public synchronized void unsubscribed(final String to) {
         this.sendPresence(to, "unsubscribed", null, null, 0);
     }
 
@@ -518,7 +596,7 @@ public class Jxa extends Thread {
      * @param group the group of the contact
      * @param subscription the subscription of the contact
      */
-    public void saveContact(final String jid, final String name, final Enumeration group, final String subscription) {
+    public synchronized void saveContact(final String jid, final String name, final Enumeration group, final String subscription) {
         try {
             this.writer.startTag("iq");
             this.writer.attribute("type", "set");
@@ -555,7 +633,7 @@ public class Jxa extends Thread {
      * @throws java.io.IOException is thrown if {@link XmlReader} or {@link XmlWriter}
      *	throw an IOException.
      */
-    public void getRoster() throws IOException {
+    public synchronized void getRoster() throws IOException {
         this.writer.startTag("iq");
         this.writer.attribute("id", "roster");
         this.writer.attribute("type", "get");
@@ -576,11 +654,11 @@ public class Jxa extends Thread {
      */
     private void parse() throws IOException {
         if (DEBUG) {
-            java.lang.System.out.println("*debug* parsing");
+            //java.lang.System.out.println("*debug* parsing");
         }
-        if (!use_ssl) {
-            this.reader.next(); // start tag
-        }
+        //if (!use_ssl) {
+        //    this.reader.next(); // start tag
+        //}
         while (this.reader.next() == XmlReader.START_TAG) {
             final String tmp = this.reader.getName();
             if (tmp.equals("message")) {
@@ -606,7 +684,7 @@ public class Jxa extends Thread {
      */
     private void parseIq() throws IOException {
         if (DEBUG) {
-            java.lang.System.out.println("*debug* paeseIq");
+            //java.lang.System.out.println("*debug* paeseIq");
         }
         String type = this.reader.getAttribute("type");
         final String id = this.reader.getAttribute("id");
@@ -626,13 +704,14 @@ public class Jxa extends Thread {
             }
         } else if (type.equals("result") && (id != null) && id.equals("res_binding")) {
             // authorized
+            String rsp_jid = "";
             while (true) {
                 reader.next();
                 String tagname = reader.getName();
                 if (tagname != null) {
                     if ((reader.getType() == XmlReader.START_TAG) && tagname.equals("jid")) {
                         reader.next();
-                        String rsp_jid = reader.getText();
+                        rsp_jid = reader.getText();
                         int i = rsp_jid.indexOf('/');
                         this.resource = rsp_jid.substring(i + 1);
                     //java.lang.System.out.println(this.resource);
@@ -643,7 +722,7 @@ public class Jxa extends Thread {
             }
             for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                 XmppListener xl = (XmppListener) e.nextElement();
-                xl.onAuth(this.resource);
+                xl.onAuth(rsp_jid);
             }
             this.sendPresence(null, null, null, null, this.priority);
         } else {
@@ -656,6 +735,7 @@ public class Jxa extends Thread {
                                 type = this.reader.getAttribute("type");
                                 String jid = reader.getAttribute("jid");
                                 String name = reader.getAttribute("name");
+                                //System.out.println(jid + name);
                                 String subscription = reader.getAttribute("subscription");
                                 //newjid = (jid.indexOf('/') == -1) ? jid : jid.substring(0, jid.indexOf('/'));
                                 boolean check = true;
@@ -666,9 +746,10 @@ public class Jxa extends Thread {
                                 }*/
                                 while (this.reader.next() == XmlReader.START_TAG) {
                                     if (this.reader.getName().equals("group")) {
+                                        final String groupName = this.parseText();
                                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                                             XmppListener xl = (XmppListener) e.nextElement();
-                                            xl.onContactEvent(jid, name, this.parseText(), subscription);
+                                            xl.onContactEvent(jid, name, groupName, subscription);
                                         }
                                         check = false;
                                     } else {
@@ -685,6 +766,7 @@ public class Jxa extends Thread {
                             } else {
                                 this.parseIgnore();
                             }
+                        //System.out.println(this.reader.getName() + reader.getType());
                         }
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                             XmppListener xl = (XmppListener) e.nextElement();
@@ -725,24 +807,25 @@ public class Jxa extends Thread {
                             if (this.reader.getName().equals("status")) {
                                 status = parseText();
                             } else if (this.reader.getName().equals("show")) {
-                                show = ContactListUI.statusStringToNumber(parseText());
-                            }
-                            if (this.reader.getName().equals("status-list")) {
+                                show = statusStringToNumber(parseText());
+                            } else if (this.reader.getName().equals("status-list")) {
                                 if (this.reader.getAttribute("show").equals("away")) {
                                     fillShareStatusVector(awayList);
-                                }
-                                if (this.reader.getAttribute("show").equals("dnd")) {
+                                } else if (this.reader.getAttribute("show").equals("dnd")) {
                                     fillShareStatusVector(busyList);
-                                }
-                                if (this.reader.getAttribute("show").equals("default")) {
+                                } else if (this.reader.getAttribute("show").equals("default")) {
                                     fillShareStatusVector(onlineList);
                                 }
+                            } else {
+                                this.parseIgnore();
                             }
                         }
 
+                        System.out.println();
+                        //System.out.println(this.reader.getName() + this.reader.getType());
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                             XmppListener xl = (XmppListener) e.nextElement();
-                            xl.onSharedStatusEvent(status,show,awayList,busyList,onlineList);
+                            xl.onSharedStatusEvent(status, show, awayList, busyList, onlineList);
                         }
 
                     } else {
@@ -753,6 +836,25 @@ public class Jxa extends Thread {
                 }
             }
         }
+    }
+
+    public static int statusStringToNumber(String str) {
+        if (str.equals("away")) {
+            return 1;
+        }
+        if (str.equals("na")) {
+            return 2;
+        }
+        if (str.equals("xa")) {
+            return 2;
+        }
+        if (str.equals("busy")) {
+            return 3;
+        }
+        if (str.equals("dnd")) {
+            return 3;
+        }
+        return 0;
     }
 
     /**
@@ -779,7 +881,7 @@ public class Jxa extends Thread {
         }
 
         if (DEBUG) {
-            java.lang.System.out.println("*debug* from,type,status,show:" + from + "," + type + "," + status + "," + show);
+            //java.lang.System.out.println("*debug* from,type,status,show:" + from + "," + type + "," + status + "," + show);
         }
 
         //if ((type != null) && (type.equals("unavailable") || type.equals("unsubscribed") || type.equals("error"))) {
@@ -884,5 +986,68 @@ public class Jxa extends Thread {
         close(msg);
 
 
+    }
+
+    String generateTokenViaGoogle() {
+        if (this.googleToken.equals("")) {
+            String first = "Email=" + myjid + "&Passwd=" + password + "&PersistentCookie=false&source=mgtalk";
+            try {
+                HttpsConnection c = (HttpsConnection) Connector.open("https://www.google.com:443/accounts/ClientAuth?" + first);
+                //LOG: Connection go GOOGLE
+                DataInputStream dis = c.openDataInputStream();
+                String str = readLine(dis);
+                String SID = "";
+                String LSID = "";
+                if (str.startsWith("SID=")) {
+                    SID = str.substring(4, str.length());
+                    str = readLine(dis);
+                    LSID = str.substring(5, str.length());
+                    first = "SID=" + SID + "&LSID=" + LSID + "&service=mail&Session=true";
+                    dis.close();
+                    c.close();
+                    c = (HttpsConnection) Connector.open("https://www.google.com:443/accounts/IssueAuthToken?" + first);
+                    //LOG Next connection
+                    dis = c.openDataInputStream();
+                    str = readLine(dis);
+                    String token = Base64.encode(new String("\0" + myjid + "\0" + str).getBytes());
+                    dis.close();
+                    c.close();
+                    googleToken = token;
+                    return token;
+
+                } else {
+                    throw new Exception("Invalid response");
+                }
+
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+            }
+
+        } else {
+            return googleToken;
+        }
+
+        return "";
+
+    }
+
+    String readLine(
+            DataInputStream dis) {
+        String s = "";
+        byte ch = 0;
+        try {
+            while ((ch = dis.readByte()) != -1) {
+                if (ch == '\n') {
+                    return s;
+                }
+
+                s += (char) ch;
+            }
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        return s;
     }
 };

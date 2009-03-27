@@ -73,6 +73,10 @@ public class XmlReader {
                 t = ((a & 0x1F) << 6) | (b & 0x3F);
             }
         }
+        System.out.print((char)t);
+        if((char)t == '>'){
+            System.out.println();
+        }
         return t;
     }
 

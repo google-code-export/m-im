@@ -15,13 +15,11 @@ import org.rost.mobile.guilib.components.layers.*;
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.ItemInterface;
 import org.rost.mobile.guilib.core.LayerInterface;
-import org.rost.mobile.guilib.core.BaseMidlet;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.mgtalk.AppStore;
 import org.rost.mobile.mgtalk.model.User;
 import org.rost.mobile.mgtalk.model.UserMessageListener;
 import org.rost.mobile.mgtalk.model.UserStateListener;
-import org.rost.mobile.mgtalk.utils.NetworkTools;
 
 /**
  *
@@ -61,7 +59,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     }
 
     public boolean leftCommandClick() {
-        System.out.println("Send here");
+        //System.out.println("Send here");
         if (textBox.getValue().equals("")) {
             return true;
         }
@@ -139,7 +137,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
         if (from) {
             AppStore.playMessage();
         }
-        System.out.println("New message!");
+        //System.out.println("New message!");
         history.pushItemFront(item);
         history.setCurrentPosition(0);
         notifyChanged();

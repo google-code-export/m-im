@@ -10,27 +10,22 @@ package org.rost.mobile.mgtalk.ui;
 
 import java.io.IOException;
 import java.util.Vector;
-import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import net.sourceforge.jxa.Jxa;
 import net.sourceforge.jxa.XmppAdapter;
 import net.sourceforge.jxa.XmppListener;
 import org.rost.mobile.guilib.components.MenuItem;
-import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.guilib.components.layers.Menu;
 import org.rost.mobile.guilib.components.layers.SelectableList;
 import org.rost.mobile.guilib.core.BaseMidlet;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.guilib.core.ItemActionListener;
-import org.rost.mobile.guilib.core.LayerInterface;
 import org.rost.mobile.mgtalk.AppStore;
-import org.rost.mobile.mgtalk.controllers.ConnectionTerminatedListener;
-import org.rost.mobile.mgtalk.controllers.ReadStanzaListener;
 import org.rost.mobile.mgtalk.i18n.i18n;
+import org.rost.mobile.mgtalk.model.Profile;
 import org.rost.mobile.mgtalk.model.User;
 import org.rost.mobile.mgtalk.model.UserAddedListener;
 import org.rost.mobile.mgtalk.model.UserDeletedListener;
-import org.rost.mobile.mgtalk.model.UserMessageListener;
-import org.rost.mobile.mgtalk.utils.XmlNode;
 
 /**
  *
@@ -47,70 +42,28 @@ public class ContactListUI extends SelectableList implements
             AppStore.getContactList().processNewMessage(from, body);
         }
 
-        public boolean stanzaReceived(XmlNode stanza) {
-            if (stanza.getName().equals("message")) {
-//                System.out.println("stanza = "+stanza);
-                AppStore.getContactList().processNewMessage(stanza.getAttr("from"), stanza.childValue("body"));
-                return true;
-            }
-            System.out.println("stanza = " + stanza);
-            return false;
-        }
     };
     XmppListener contactListListener = new XmppAdapter() {
 
         public void onStatusEvent(String jid, String show, String status) {
-            AppStore.getContactList().processUserStateChange("", jid, status, statusStringToNumber(show));
+            AppStore.getContactList().processUserStateChange("", jid, status, Jxa.statusStringToNumber(show));
         }
 
         public void onContactEvent(String jid, String name, String group, String subscription) {
             AppStore.getContactList().processUserStateChange(name, jid, "", -1);
         }
 
-        public boolean stanzaReceived(XmlNode stanza) {
-
-            if (stanza.getName().equals("presence")) {
-//                System.out.println("stanza = "+stanza);
-                int statusID = stanza.getAttr("type").equals("unavailable") ? -1 : statusStringToNumber(stanza.childValue("show"));
-                AppStore.getContactList().processUserStateChange("", stanza.getAttr("from"), stanza.childValue("status"), statusID);
-                return true;
-            }
-            if (stanza.getName().equals("iq") && stanza.child("query").getAttr("xmlns").equals("jabber:iq:roster")) {
-//                System.out.println("stanza = "+stanza);
-                AppStore.getSelectedProfile().setFullJID(stanza.getAttr("to"));
-                Vector v = stanza.child("query").getChilds();
-                for (int i = 0; i < v.size(); i++) {
-                    XmlNode y = (XmlNode) v.elementAt(i);
-                    AppStore.getContactList().processUserStateChange(y.getAttr("name"), y.getAttr("jid"), "", -1);
-                }
-                return true;
-            }
-            return false;
-        }
     };
+
+    public Profile profile() {
+        return AppStore.getSelectedProfile();
+    }
 
     public void refreshView() {
         setCaption(AppStore.getSelectedProfile().getUserName());
     }
 
-    public static int statusStringToNumber(String str) {
-        if (str.equals("away")) {
-            return 1;
-        }
-        if (str.equals("na")) {
-            return 2;
-        }
-        if (str.equals("xa")) {
-            return 2;
-        }
-        if (str.equals("busy")) {
-            return 3;
-        }
-        if (str.equals("dnd")) {
-            return 3;
-        }
-        return 0;
-    }
+    
 
     public static Image statusIDToImage(int statusID) {
         switch (statusID) {
@@ -209,13 +162,16 @@ public class ContactListUI extends SelectableList implements
     }
 
     public void userDeleted(int userPosition) {
-        System.out.println("Deleted user in " + userPosition);
+       // System.out.println("Deleted user in " + userPosition);
         removeItem(userPosition);
     }
 
-    public void connectionTerminated() {
+    public void connectionTerminated(String msg) {
+        if (msg == null){
+            msg = "Disconnected";
+        }
         AppStore.getContactList().makeAllUsersOffline();
-        AppStore.getInfoTicker().setMessage("Disconnected", true);
+        AppStore.getInfoTicker().setMessage(msg, true);
     }
 
     public void actionPerformed() {
@@ -225,14 +181,21 @@ public class ContactListUI extends SelectableList implements
     }
 
     public void onConnFailed(String msg) {
-        connectionTerminated();
+        connectionTerminated(msg);
     }
 
-    public void onAuth(String resource) {
+    public void onAuth(String responseJid) {
         try {
+            profile().setFullJID(responseJid);
+            AppStore.getJxa().startSession();
+            if(profile().isGoogle()){
+                AppStore.getJxa().sendGoogleSettings();
+            }else{
+                AppStore.getJxa().setStatus(Jxa.statusIDtoString(profile().getStatusID()), profile().getStatus(), 0);
+            }
             AppStore.getJxa().getRoster();
         } catch (IOException ex) {
-            connectionTerminated();
+            connectionTerminated(ex.getMessage());
         }
     }
 

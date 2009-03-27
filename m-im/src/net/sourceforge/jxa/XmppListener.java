@@ -35,7 +35,7 @@ public interface XmppListener {
     /**
      * This event occurs when the login/authentication process succeeds.
      */
-    public void onAuth(final String resource);
+    public void onAuth(final String responseJid);
 
     /**
      * This event occurs when the login/authentication process fails.
