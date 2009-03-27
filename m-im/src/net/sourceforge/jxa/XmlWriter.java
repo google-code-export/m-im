@@ -93,7 +93,7 @@ public class XmlWriter {
             writer.write('>');
             this.inside_tag = false;
         }
-        this.writeEscaped(this.encodeUTF(str));
+        this.writeEscaped(str);
     }
 
     private void writeEscaped(final String str) throws IOException {
@@ -114,15 +114,6 @@ public class XmlWriter {
                 default:
                     writer.write(c);
             }
-        }
-    }
-
-    private String encodeUTF(final String str) {
-        try {
-            final String utf = new String(str.getBytes("UTF-8"));
-            return utf;
-        } catch (final UnsupportedEncodingException e) {
-            return null;
         }
     }
 };

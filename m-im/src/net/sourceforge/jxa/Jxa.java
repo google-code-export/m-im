@@ -149,7 +149,7 @@ public class Jxa extends Thread {
                 this.writer = new XmlWriter(os);
             }
         } catch (final CertificateException ex) {
-            java.lang.System.out.println(ex);
+            //java.lang.System.out.println(ex);
             this.connectionFailed(ex.getReason() + ex.getMessage());
             return;
         } catch (final Exception e) {
@@ -821,7 +821,7 @@ public class Jxa extends Thread {
                             }
                         }
 
-                        System.out.println();
+                        //System.out.println();
                         //System.out.println(this.reader.getName() + this.reader.getType());
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                             XmppListener xl = (XmppListener) e.nextElement();
