@@ -34,7 +34,8 @@ public class GUIStore {
         return display;
     }
 
-    public GUIStore() {
+	// Should not be able to instantiate this class anyway
+    private GUIStore() {
     }
 
     public static BaseCanvas getCanvas() {

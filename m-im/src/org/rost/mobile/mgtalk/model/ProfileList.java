@@ -33,7 +33,7 @@ public class ProfileList {
             RecordStore store = RecordStore.openRecordStore(STORE_NAME, true);
             for (RecordEnumeration e = store.enumerateRecords(null, null, false); e.hasNextElement();) {
                 int id = e.nextRecordId();
-                Profile p = new Profile();
+                Profile p = new Profile(false);
                 p.setId(id);
                 p.fromByteArray(store.getRecord(id));
                 profiles.addElement(p);

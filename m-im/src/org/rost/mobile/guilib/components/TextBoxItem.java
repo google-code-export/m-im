@@ -29,13 +29,19 @@ public class TextBoxItem implements ItemInterface {
     int valueWidth = width - 7;
 
     public TextBoxItem() {
-        this(GUIMisc.getActiveWidth());
+        this(GUIMisc.getActiveWidth(), true);
     }
 
-    public TextBoxItem(int width) {
+    public TextBoxItem(boolean withCaption) {
+        this(GUIMisc.getActiveWidth(), false);
+    }
+    
+    public TextBoxItem(int width, boolean withCaption) {
         this.width = width;
         valueWidth = width - 7;
+        if (withCaption) {
         caption = new StaticRichText(width - 2);
+        }
         value = new StaticRichText(valueWidth);
     }
 
@@ -51,8 +57,10 @@ public class TextBoxItem implements ItemInterface {
     public void paintInternal(boolean selected, Graphics g, int x, int y) {
         g.setColor(GUIMisc.getItemBgColor());
         g.fillRect(x, y, width, getHeight());
+        if (caption != null) {
         caption.paint(g, x + 1, y, false);
-        int startY = y + caption.getHeight();
+        }
+        int startY = y + (caption != null ? caption.getHeight() : 0);
         int valueHeight = value.getHeight();
         g.setColor(0x000000);
         g.drawRect(x + 2, startY + 1, width - 4, valueHeight + 3);
@@ -87,7 +95,7 @@ public class TextBoxItem implements ItemInterface {
     }
 
     public int getHeight() {
-        int height = caption.getHeight() + 7 + value.getHeight();
+        int height = (caption != null ? caption.getHeight() + 7 : 5) + value.getHeight();
         return height;
     }
 

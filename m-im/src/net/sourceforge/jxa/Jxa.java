@@ -385,6 +385,21 @@ public class Jxa extends Thread {
         }
     }
 
+    public synchronized void sendPing(final int id) {
+        try {
+            this.writer.startTag("iq");
+            this.writer.attribute("type", "get");
+            this.writer.attribute("id", "" + id);
+            this.writer.startTag("ping");
+            this.writer.attribute("xmlns", "urn:xmpp:ping");
+            this.writer.endTag();
+            this.writer.endTag();
+            this.writer.flush();
+        } catch (final Exception e) {
+            this.connectionFailed(e.getMessage());
+        }    	
+    }
+    
     public synchronized void sendGoogleSettings() {
         try {
             os.write(("<iq type=\"get\" id=\"6\"><query xmlns=\"google:relay\"/></iq>").getBytes());

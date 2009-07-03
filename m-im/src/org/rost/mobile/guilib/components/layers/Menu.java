@@ -9,13 +9,14 @@
 package org.rost.mobile.guilib.components.layers;
 
 import java.util.Vector;
+
 import javax.microedition.lcdui.Graphics;
+
 import org.rost.mobile.guilib.components.MenuItem;
 import org.rost.mobile.guilib.components.SubMenuItem;
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.guilib.core.LayerInterface;
-import org.rost.mobile.guilib.core.BaseCanvas;
 
 /**
  *
@@ -52,7 +53,7 @@ public class Menu extends LayerInterface {
         items.addElement(item);
         height += item.getHeight();
     }
-
+    
     public void paintCustom(Graphics g) {
         //Draw border
 

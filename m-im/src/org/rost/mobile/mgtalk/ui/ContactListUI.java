@@ -22,6 +22,7 @@ import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.guilib.core.ItemActionListener;
 import org.rost.mobile.mgtalk.AppStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
+import org.rost.mobile.mgtalk.model.GlobalPrefs;
 import org.rost.mobile.mgtalk.model.Profile;
 import org.rost.mobile.mgtalk.model.User;
 import org.rost.mobile.mgtalk.model.UserAddedListener;
@@ -31,11 +32,11 @@ import org.rost.mobile.mgtalk.model.UserDeletedListener;
  *
  * @author Kostya
  */
-public class ContactListUI extends SelectableList implements
-        UserAddedListener, UserDeletedListener, XmppListener, ItemActionListener {
+public class ContactListUI extends SelectableList implements UserAddedListener, UserDeletedListener, XmppListener, ItemActionListener {
 
     /** Creates a new instance of ContactListUI */
     Menu menu = null;
+    
     XmppListener newMessagesListener = new XmppAdapter() {
 
         public void onMessageEvent(String from, String body) {
@@ -99,6 +100,32 @@ public class ContactListUI extends SelectableList implements
         });
         menu.addMenuItem(statusItem);
 
+        MenuItem globalPrefsItem = new MenuItem(i18n.getMessage("globalprefs"));
+        globalPrefsItem.setItemActionListener(new ItemActionListener() {
+        	public void actionPerformed() {
+        		GlobalPrefsUI ui = AppStore.getGlobalPrefsUI();
+        		ui.setBackToInterface(AppStore.getContactListUI());
+        		GUIStore.getManager().push(ui);
+        		GUIStore.getManager().notifyChanged();
+        	}
+        });
+        menu.addMenuItem(globalPrefsItem);
+
+        MenuItem muteItem = new MenuItem(i18n.getMessage("menu_item_mute"));
+        muteItem.setItemActionListener(new ItemActionListener() {
+            public void actionPerformed() {
+            	GlobalPrefs gp = AppStore.getGlobalPrefs();
+            	boolean soundEnabled = gp.isSoundEnabled();
+            	if (soundEnabled) {
+            		gp.setSoundEnabled(false);
+            	} else {
+            		gp.setSoundEnabled(true);
+            	}
+            	//gp.setSoundEnabled(soundEnabled ? false : true);
+            }
+        });
+        menu.addMenuItem(muteItem);        
+        
         MenuItem dissItem = new MenuItem(i18n.getMessage("disconnect"));
         dissItem.setItemActionListener(new ItemActionListener() {
 
@@ -122,7 +149,9 @@ public class ContactListUI extends SelectableList implements
         menu.addMenuItem(quitItem);        
 
         setLeftCommand(i18n.getMessage("menu"));
-        setRightCommand(i18n.getMessage("minimise")); //status || minimise
+	        
+      //minimise if supported (S60) otherwise status S40 etc 
+        setRightCommand(AppStore.isS60() ? i18n.getMessage("minimise") : i18n.getMessage("status"));
         
     /*
     AppStore.getNetworkDispatcher().addListener(contactListListener);
@@ -152,8 +181,13 @@ public class ContactListUI extends SelectableList implements
         //GUIStore.getManager().push(AppStore.getSharedStatusUI());
         //GUIStore.getManager().notifyChanged();
         
-        // Minimise support
-        GUIStore.minimiseApplication();
+        // Minimise or show status UI
+    	if (AppStore.isS60()) {
+        	GUIStore.minimiseApplication();
+    	} else {
+            GUIStore.getManager().push(AppStore.getSharedStatusUI());
+            GUIStore.getManager().notifyChanged();    		
+    	}
         
         return true;
     }
@@ -181,7 +215,7 @@ public class ContactListUI extends SelectableList implements
         ContactListItem item = new ContactListItem(
                 statusIDToImage(user.getStatusID()),
                 (user.getUnreadMessages() > 0 ? "[" + user.getUnreadMessages() + "] " : "") + user.getUserName(),
-                user.getStatus());
+                user.getStatus(), true);
         item.setItemActionListener(this);
         addItem(item, userPosition);
     }
@@ -247,4 +281,5 @@ public class ContactListUI extends SelectableList implements
 
     public void onSharedStatusEvent(String status, int show, Vector awayList, Vector busyList, Vector onlineList) {
     }
+    
 }

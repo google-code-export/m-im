@@ -13,6 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
+import org.rost.mobile.mgtalk.AppStore;
+
 /**
  *
  * @author kostya
@@ -31,6 +33,8 @@ public class Profile {
     protected String name = "Google talk";
     protected boolean autoConnect = false;//
     protected boolean autoReconnect = true;
+    protected boolean keepalive = true;
+    protected boolean xmppPing = true;
     protected boolean google = true;
     protected boolean SSL = false;//
     protected boolean sortByName = false;//
@@ -45,13 +49,22 @@ public class Profile {
     protected String fullJID = "";
     protected int id = -1;
 
-    public Profile() {
+    public Profile(boolean initWithGlobalValues) {
     	String meplatform = System.getProperty("microedition.platform");
     	if (meplatform != null && meplatform.length() > 0) {
     		int index = meplatform.indexOf('/');
     		if (index == -1) { index = meplatform.length(); }
     		resource = meplatform.substring(0, index);
     	}
+    	
+    	if (initWithGlobalValues) {
+    		GlobalPrefs prefs = AppStore.getGlobalPrefs();
+    		this.displayName = prefs.getDisplayName();
+    		this.volume = prefs.getVolume();
+    		this.vibrate = prefs.isVibrate();
+    		this.vibrateTime = prefs.getVibrateTime();
+    	}
+    	
     }
 
     public byte[] toByteArray() {
@@ -69,6 +82,8 @@ public class Profile {
             os.writeUTF(name);
             os.writeBoolean(autoConnect);
             os.writeBoolean(autoReconnect);
+            os.writeBoolean(keepalive);
+            os.writeBoolean(xmppPing);
             os.writeBoolean(google);
             os.writeBoolean(SSL);
             os.writeBoolean(sortByName);
@@ -107,6 +122,8 @@ public class Profile {
             name = is.readUTF();
             autoConnect = is.readBoolean();
             autoReconnect = is.readBoolean();
+            keepalive = is.readBoolean();
+            xmppPing = is.readBoolean();
             google = is.readBoolean();
             SSL = is.readBoolean();
             sortByName = is.readBoolean();
@@ -127,7 +144,7 @@ public class Profile {
         return false;
     }
 
-    public String getUserName() {
+	public String getUserName() {
         return userName;
     }
 
@@ -207,9 +224,24 @@ public class Profile {
         this.autoReconnect = autoReconnect;
     }
 
+    public boolean isKeepalive() {
+		return keepalive;
+	}
+
+	public void setKeepalive(boolean keepalive) {
+		this.keepalive = keepalive;
+	}
+
+	public boolean isXmppPing() {
+		return xmppPing;
+	}
+
+	public void setXmppPing(boolean xmppPing) {
+		this.xmppPing = xmppPing;
+	}
+
     public boolean isGoogle() {
         return google;
-        //return false;
     }
 
     public void setGoogle(boolean google) {
@@ -319,4 +351,5 @@ public class Profile {
     public void setFullJID(String fullJID) {
         this.fullJID = fullJID;
     }
+    
 }

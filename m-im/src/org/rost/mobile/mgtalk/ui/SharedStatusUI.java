@@ -9,7 +9,7 @@
 package org.rost.mobile.mgtalk.ui;
 
 import java.util.Vector;
-import net.sourceforge.jxa.Jxa;
+
 import org.rost.mobile.guilib.components.CheckBoxItem;
 import org.rost.mobile.guilib.components.ReadOnlyTextItem;
 import org.rost.mobile.guilib.components.TextBoxItem;
@@ -18,8 +18,7 @@ import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.guilib.core.ItemActionListener;
 import org.rost.mobile.guilib.core.RadioGroup;
 import org.rost.mobile.mgtalk.AppStore;
-import org.rost.mobile.mgtalk.model.Profile;
-import org.rost.mobile.mgtalk.model.SharedStatus;
+import org.rost.mobile.mgtalk.i18n.i18n;
 
 /**
  *
@@ -33,16 +32,18 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
 
     public SharedStatusUI() {
         status = new TextBoxItem("Set custom status here:");
-        setLeftCommand("Set");
-        setRightCommand("Close");
-        setCaption("Status:");
+        setLeftCommand(i18n.getMessage("button_set"));
+        setRightCommand(i18n.getMessage("button_close"));
+        setCaption(i18n.getMessage("caption_status"));
     }
-    CheckBoxItem defaultOnline = new CheckBoxItem("Default", true);
-    CheckBoxItem customOnline = new CheckBoxItem("Set custom", true);
-    CheckBoxItem defaultBusy = new CheckBoxItem("Default", true);
-    CheckBoxItem customBusy = new CheckBoxItem("Set custom", true);
-    CheckBoxItem defaultAway = new CheckBoxItem("Default", true);
-    CheckBoxItem customAway = new CheckBoxItem("Set custom", true);
+    String setCustom = i18n.getMessage("set_custom");
+    String strDefault = i18n.getMessage("default");
+    CheckBoxItem defaultOnline = new CheckBoxItem(strDefault, true);
+    CheckBoxItem customOnline = new CheckBoxItem(setCustom, true);
+    CheckBoxItem defaultBusy = new CheckBoxItem(strDefault, true);
+    CheckBoxItem customBusy = new CheckBoxItem(setCustom, true);
+    CheckBoxItem defaultAway = new CheckBoxItem(strDefault, true);
+    CheckBoxItem customAway = new CheckBoxItem(setCustom, true);
 
     void generateRadioFromVector(Vector v, int statusID) {
         for (int i = 0; i < v.size(); i++) {

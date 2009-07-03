@@ -12,7 +12,6 @@ import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.guilib.components.layers.MessageDialog;
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.GUIStore;
-import org.rost.mobile.mgtalk.AppStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
 
 /**

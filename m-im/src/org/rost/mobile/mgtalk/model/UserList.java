@@ -10,8 +10,6 @@ package org.rost.mobile.mgtalk.model;
 
 import java.util.Vector;
 
-import javax.microedition.lcdui.Display;
-
 import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.mgtalk.AppStore;
 
@@ -85,7 +83,7 @@ public class UserList implements UserStateListener, UserMessageListener {
     }
 
     public void processNewMessage(String fromJID, String message) {
-        if (message.equals("")) {
+        if (message == null || message.equals("")) {
             return;
         }
         String rightJID = fromJID;
@@ -202,10 +200,11 @@ public class UserList implements UserStateListener, UserMessageListener {
     public boolean newMessageReceived(User user, StaticRichText item, boolean from) {
         if (from) {
             user.setUnreadMessages(user.getUnreadMessages() + 1);
-            AppStore.playMessage();
-            if (AppStore.getSelectedProfile().isVibrate()) {
-            	AppStore.vibrate();
-            }
+            AppStore.notifyMessage();
+//            AppStore.playMessage();
+//            if (AppStore.getSelectedProfile().isVibrate()) {
+//            	AppStore.vibrate();
+//            }
             AppStore.getInfoTicker().setMessage("New message from " + user.getUserName());
         }
         return true;

@@ -28,6 +28,7 @@ public class ContactListItem implements ItemInterface {
     int width = GUIMisc.getActiveWidth();
     int height = 0;
     boolean showStatus = false;
+    boolean showStatusLine = false;
     ItemActionListener listener;
 
     public void setItemActionListener(ItemActionListener listener) {
@@ -41,7 +42,8 @@ public class ContactListItem implements ItemInterface {
     }
 
     /** Creates a new instance of ContactListItem */
-    public ContactListItem(Image icon, String name, String status) {
+    public ContactListItem(Image icon, String name, String status, boolean showStatusLine) {
+        this.showStatusLine = showStatusLine;
         setInfo(icon, name, status);
     }
 
@@ -54,9 +56,11 @@ public class ContactListItem implements ItemInterface {
         this.name = new StaticRichText(width - icon.getWidth());
         this.status = new StaticRichText();
         this.name.addText(GUIMisc.cutStringToWidth(name, GUIMisc.getBoldFont(), width - icon.getWidth()), true, -1);
-        this.status.addText(fullStatus ? status : GUIMisc.cutStringToWidth(status, GUIMisc.getNormalFont(), width));
-        showStatus = !status.equals("");
-        height = Math.max(icon.getHeight(), this.name.getHeight()) + (showStatus ? this.status.getHeight() : 0);
+        if (showStatusLine) {
+	        this.status.addText(fullStatus ? status : GUIMisc.cutStringToWidth(status, GUIMisc.getNormalFont(), width));
+    	    showStatus = !status.equals("");
+	    }
+        height = Math.max(icon.getHeight(), this.name.getHeight()) + (showStatusLine && showStatus ? this.status.getHeight() : 0);
     }
 
     public void paint(Graphics g, int x, int y) {
@@ -76,7 +80,7 @@ public class ContactListItem implements ItemInterface {
         } else {
             name.paint(g, x + icon.getWidth(), y);
         }
-        if (!showStatus) {
+        if (!showStatusLine || !showStatus) {
             return;
         }
         if (selected) {

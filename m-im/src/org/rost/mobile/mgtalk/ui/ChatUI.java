@@ -17,6 +17,7 @@ import org.rost.mobile.guilib.core.ItemInterface;
 import org.rost.mobile.guilib.core.LayerInterface;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.mgtalk.AppStore;
+import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.User;
 import org.rost.mobile.mgtalk.model.UserMessageListener;
 import org.rost.mobile.mgtalk.model.UserStateListener;
@@ -36,12 +37,12 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     User user = null;
 
     public ChatUI() {
-        textBox = new TextBoxItem();
-        textBox.getCaption().addText("Type message here:", true, -1);
-        setLeftCommand("Send");
-        setRightCommand("List");
+        textBox = new TextBoxItem(false); // This could be parameterised so that it's a choice whether to show status line or not!
+        //textBox.getCaption().addText("Type message here:", true, -1);
+        setLeftCommand(i18n.getMessage("button_send"));
+        setRightCommand(i18n.getMessage("button_list"));
         history = new UnselectableList();
-        contactInfo = new ContactListItem(AppStore.STATUS_OFFLINE, "", "");
+        contactInfo = new ContactListItem(AppStore.STATUS_OFFLINE, "", "", false);
     }
 
     public void paintCustom(Graphics g) {
@@ -137,7 +138,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
 
     public boolean newMessageReceived(User user, StaticRichText item, boolean from) {
         if (from) {
-            AppStore.playMessage();
+            AppStore.notifyMessage();
         }
         //System.out.println("New message!");
         history.pushItemFront(item);

@@ -1,3 +1,49 @@
+v1.2.0 - Updated release by Mark
+
+	** Application Data NOT backwards compatible with v1.1.0!!!
+	Either uninstall v1.1.0 then install v1.2.0 or answer "No" if 
+	your phone prompts you to keep the existing application data
+
+	* New translations required in this version
+
+	* New Keepalive Option
+	  - Added XmppPinger class which sends an IQ PING packet (XMPP standard) every 5 minutes to the server, to keep the connection alive.
+	
+	Refactor of TextBoxItem to allow optional captions - this allows us to hide the message above the create new message dialog
+
+	Added Constants class to be used later
+
+	Made GUIStore constructor private so nothing can instantiate it
+	
+	Added a couple of utility methods to AppStore for later usage
+	Added "isS40" and "isS60" methods to AppStore
+	
+	Used isS40 and isS60 methods in ContactListUI to determine whether to display "minimise" or "status" button
+	
+	Added mute/unmute and global prefs menu links	
+	
+	Added Global Preferences for:
+	Sounds On/Off (including mute/unmute support) - global override
+	Display Name (default picked up for new profiles)
+	Volume (default picked up for new profiles)
+	Vibrate Alert (default picked up for new profiles)
+	Vibration Time (default picked up for new profiles)
+
+	Removed Class NetworkDispatcher from the source tree
+
+	Added MIMConstants interface with default values defined as constants
+
+	Fixed a potential (it happened once or twice) NPE in processNewMessage() on UserList class 
+
+	Fixed a couple of UI consistency issues with capitalisation and colon usage in the English resources file
+	Externalised as many strings as I can find on the UI to ease future translations
+
+	According to Nokia Style Guidelines:
+	Commands can be grouped to postive (OK, ITEM, SCREEN, HELP) and negative (BACK, CANCEL, EXIT, STOP).
+	Nokia user interface guidelines and style positions negative operations like backward navigation to right softkey. 
+	Positive operations like forward navigation is in left or middle softkeys.
+	Double-checking that this is obeyed, MicroEmulator puts the text editing dialog buttons the opposite way of course!! 
+
 v1.1.0 - Updated release by Mark
 
 	** Application Data NOT backwards compatible with v1.0.0!!!
@@ -35,6 +81,8 @@ v1.1.0 - Updated release by Mark
 		applications, and false otherwise. This can then be used to
 		determine whether minimise or another function is assigned
 		to the right screen key on the UI
+		
+		Still having connection timeout problems (intermittently)
 
 v1.0.0 - Initial Release uploaded to googlecode by chunlinyao
 	

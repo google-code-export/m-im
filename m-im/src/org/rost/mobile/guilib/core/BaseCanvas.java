@@ -5,17 +5,10 @@
  */
 package org.rost.mobile.guilib.core;
 
-import java.io.IOException;
-import java.util.Vector;
-import javax.microedition.lcdui.*;
-import javax.microedition.midlet.MIDletStateChangeException;
-import org.rost.mobile.guilib.components.CheckBoxItem;
-import org.rost.mobile.guilib.components.OneLineItem;
-import org.rost.mobile.guilib.components.TextBoxItem;
+import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Graphics;
+
 import org.rost.mobile.guilib.components.layers.SelectableList;
-import org.rost.mobile.guilib.components.layers.SimpleLayer;
-import org.rost.mobile.guilib.components.StaticRichText;
-import org.rost.mobile.guilib.components.layers.UnselectableList;
 
 /**
  *

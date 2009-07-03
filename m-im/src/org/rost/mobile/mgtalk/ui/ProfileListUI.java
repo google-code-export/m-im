@@ -36,7 +36,7 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
 
             public void actionPerformed() {
                 //New action
-                Profile profile = new Profile();
+                Profile profile = new Profile(true);
                 AppStore.getProfileUI().setProfile(profile);
                 GUIStore.getManager().push(AppStore.getProfileUI());
                 GUIStore.getManager().notifyChanged();
@@ -74,8 +74,29 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
             }
         });
         menu.addMenuItem(delItem);
+        
+        MenuItem globalPrefsItem = new MenuItem(i18n.getMessage("globalprefs"));
+        globalPrefsItem.setItemActionListener(new ItemActionListener() {
+        	public void actionPerformed() {
+        		GlobalPrefsUI ui = AppStore.getGlobalPrefsUI();
+        		ui.setBackToInterface(AppStore.getProfileListUI());
+        		GUIStore.getManager().push(ui);
+        		GUIStore.getManager().notifyChanged();
+        	}
+        });
+        menu.addMenuItem(globalPrefsItem);
+        
+        MenuItem quitItem = new MenuItem(i18n.getMessage("quit"));
+        quitItem.setItemActionListener(new ItemActionListener() {
+        	public void actionPerformed() {
+        		quitMIM();
+        	}
+        });
+        menu.addMenuItem(quitItem);
+        
         setLeftCommand(i18n.getMessage("menu"));
-        setRightCommand(i18n.getMessage("quit"));
+        //setRightCommand(i18n.getMessage("quit"));
+        setRightCommand(i18n.getMessage("globalprefs"));
     }
 
     public void refreshView() {
@@ -90,13 +111,27 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
             addItem(item);
         }
     }
-
+/*
     public boolean rightCommandClick() {
         if (AppStore.getJxa() != null) {
             AppStore.getJxa().close();
         }
         BaseMidlet.closeMIDLet();
         return true;
+    }
+*/
+  
+    public void quitMIM() {
+        if (AppStore.getJxa() != null) {
+            AppStore.getJxa().close();
+        }
+        BaseMidlet.closeMIDLet();
+    }
+    
+    public boolean rightCommandClick() {
+		GUIStore.getManager().push(AppStore.getGlobalPrefsUI());
+		GUIStore.getManager().notifyChanged();
+		return true;
     }
 
     public boolean leftCommandClick() {

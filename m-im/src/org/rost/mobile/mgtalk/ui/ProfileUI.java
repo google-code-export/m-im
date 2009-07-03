@@ -31,7 +31,8 @@ public class ProfileUI extends SelectableList {
     Profile profile = null;
     TextBoxItem name, userName, displayName, host, port, resource, status, historyLength;
     PasswordItem password;
-    CheckBoxItem autoConnect, autoReconnect, google, moveChattersTop, showOffline, smiles, SSL, statusActive, vibrate;
+    CheckBoxItem autoConnect, autoReconnect, google, moveChattersTop, showOffline, smiles, SSL, statusActive, vibrate, keepalive, xmppPing, socketKeepalive;
+    RadioGroup keepAliveGroup;
     TrackItem volume, vibrationTime;
     CheckBoxItem statusOnline, statusAway, statusNA, statusBusy, sortByName, sortByStatus;
     RadioGroup statusGroup, sortByGroup;
@@ -121,6 +122,17 @@ public class ProfileUI extends SelectableList {
         autoReconnect = new CheckBoxItem(i18n.getMessage("profile_auto_reconnect"));
         addItem(autoReconnect);
 
+        keepalive = new CheckBoxItem(i18n.getMessage("profile_keepalive"));
+        addItem(keepalive);
+        
+        socketKeepalive = new CheckBoxItem(i18n.getMessage("profile_socket_keepalive"), true);
+        xmppPing = new CheckBoxItem(i18n.getMessage("profile_xmpp_ping"), true);
+        addItem(socketKeepalive);
+        addItem(xmppPing);
+        keepAliveGroup = new RadioGroup();
+        keepAliveGroup.addItem(socketKeepalive);
+        keepAliveGroup.addItem(xmppPing);
+        
         smiles = new CheckBoxItem(i18n.getMessage("profile_smiles"));
         addItem(smiles);
 
@@ -150,7 +162,7 @@ public class ProfileUI extends SelectableList {
         startShowing = 0;
 
         name.setValue(profile.getName());
-        userName.setValue(profile.getUserName());
+        userName.setValue(profile.getUserName());        
         displayName.setValue(profile.getDisplayName());
         password.setValue(profile.getPassword());
         host.setValue(profile.getHost());
@@ -166,6 +178,8 @@ public class ProfileUI extends SelectableList {
         showOffline.setSelected(profile.isShowOffline());
         autoConnect.setSelected(profile.isAutoConnect());
         autoReconnect.setSelected(profile.isAutoReconnect());
+        keepalive.setSelected(profile.isKeepalive());
+        keepAliveGroup.setValue(profile.isXmppPing() ? 1 : 0);
         smiles.setSelected(profile.isSmiles());
         historyLength.setValue("" + profile.getHistoryLength());
         volume.setValues(10, profile.getVolume());
@@ -205,6 +219,8 @@ public class ProfileUI extends SelectableList {
         profile.setShowOffline(showOffline.isSelected());
         profile.setAutoConnect(autoConnect.isSelected());
         profile.setAutoReconnect(autoReconnect.isSelected());
+        profile.setKeepalive(keepalive.isSelected());
+        profile.setXmppPing(keepAliveGroup.getValue() == 1); // CHECK
         profile.setSmiles(smiles.isSelected());
         profile.setHistoryLength(Integer.parseInt(historyLength.getValue().toString()));
         profile.setVolume(Integer.parseInt(volume.getValue().toString()));
