@@ -1,0 +1,3 @@
+Allow show/hide of "Transports" on the buddy list
+
+Allow switch to show-hide status on the buddy list
