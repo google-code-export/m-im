@@ -9,8 +9,7 @@
 package org.rost.mobile.guilib.core;
 
 import javax.microedition.lcdui.Display;
-
-import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Displayable;
 
 /**
  *
@@ -25,6 +24,8 @@ public class GUIStore {
     protected static BaseCanvas canvas = null;
     static LayerManager manager = null;
 
+    protected static Displayable previousDisplayable = null;
+    
     public static void setDisplay(Display _display) {
         display = _display;
     }
@@ -51,4 +52,15 @@ public class GUIStore {
     public static void setManager(LayerManager aManager) {
         manager = aManager;
     }
+    
+    public static void minimiseApplication() {
+    	previousDisplayable = display.getCurrent();
+    	display.setCurrent(null);
+    }
+    
+    public static void restoreApplication() {
+    	display.setCurrent(previousDisplayable);
+    	previousDisplayable = null;
+    }
+    
 }

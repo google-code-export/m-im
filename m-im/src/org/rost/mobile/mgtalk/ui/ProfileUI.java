@@ -9,6 +9,7 @@
 package org.rost.mobile.mgtalk.ui;
 
 import org.rost.mobile.guilib.components.CheckBoxItem;
+import org.rost.mobile.guilib.components.NumberBoxItem;
 import org.rost.mobile.guilib.components.PasswordItem;
 import org.rost.mobile.guilib.components.ReadOnlyTextItem;
 import org.rost.mobile.guilib.components.TextBoxItem;
@@ -28,10 +29,10 @@ public class ProfileUI extends SelectableList {
 
     /** Creates a new instance of ProfileUI */
     Profile profile = null;
-    TextBoxItem name, userName, host, port, status, historyLength;
+    TextBoxItem name, userName, displayName, host, port, resource, status, historyLength;
     PasswordItem password;
-    CheckBoxItem autoConnect, autoReconnect, google, moveChattersTop, showOffline, smiles, SSL, statusActive;
-    TrackItem volume;
+    CheckBoxItem autoConnect, autoReconnect, google, moveChattersTop, showOffline, smiles, SSL, statusActive, vibrate;
+    TrackItem volume, vibrationTime;
     CheckBoxItem statusOnline, statusAway, statusNA, statusBusy, sortByName, sortByStatus;
     RadioGroup statusGroup, sortByGroup;
 
@@ -45,14 +46,20 @@ public class ProfileUI extends SelectableList {
         userName = new TextBoxItem(i18n.getMessage("profile_username"));
         addItem(userName);
 
+        displayName = new TextBoxItem(i18n.getMessage("profile_displayname"));
+        addItem(displayName);
+        
         password = new PasswordItem(i18n.getMessage("profile_password"));
         addItem(password);
 
         host = new TextBoxItem(i18n.getMessage("profile_host"));
         addItem(host);
 
-        port = new TextBoxItem(i18n.getMessage("profile_port"));
+        port = new NumberBoxItem(i18n.getMessage("profile_port"));
         addItem(port);
+        
+        resource = new TextBoxItem(i18n.getMessage("profile_resource"));
+        addItem(resource);
 
         SSL = new CheckBoxItem(i18n.getMessage("profile_SSL"));
         addItem(SSL);
@@ -124,6 +131,14 @@ public class ProfileUI extends SelectableList {
         volume.getCaption().addText(i18n.getMessage("profile_volume"));
         addItem(volume);
 
+        vibrate = new CheckBoxItem(i18n.getMessage("profile_vibrate"));
+        addItem(vibrate);
+        
+        vibrationTime = new TrackItem();
+        vibrationTime.getCaption().addText(i18n.getMessage("profile_vibration_time"));
+        vibrationTime.setValues(20, 8); // 20 * 100ms = 2seconds max, 800ms default
+        addItem(vibrationTime);
+        
     }
 
     void setProfile(Profile p) {
@@ -136,9 +151,11 @@ public class ProfileUI extends SelectableList {
 
         name.setValue(profile.getName());
         userName.setValue(profile.getUserName());
+        displayName.setValue(profile.getDisplayName());
         password.setValue(profile.getPassword());
         host.setValue(profile.getHost());
         port.setValue(profile.getPort());
+        resource.setValue(profile.getResource());
         SSL.setSelected(profile.isSSL());
         status.setValue(profile.getStatus());
         statusActive.setSelected(profile.isStatusActive());
@@ -152,6 +169,8 @@ public class ProfileUI extends SelectableList {
         smiles.setSelected(profile.isSmiles());
         historyLength.setValue("" + profile.getHistoryLength());
         volume.setValues(10, profile.getVolume());
+        vibrate.setSelected(profile.isVibrate());
+        vibrationTime.setValues(20, profile.getVibrateTime());
     }
 
     public boolean isMain() {
@@ -171,9 +190,11 @@ public class ProfileUI extends SelectableList {
         }
         profile.setName((String) name.getValue());
         profile.setUserName((String) userName.getValue());
+        profile.setDisplayName((String) displayName.getValue());
         profile.setPassword((String) password.getValue());
         profile.setHost((String) host.getValue());
         profile.setPort(port.getValue().toString());
+        profile.setResource((String) resource.getValue());
         profile.setSSL(SSL.isSelected());
         profile.setStatus(status.getValue().toString());
         profile.setStatusActive(statusActive.isSelected());
@@ -187,6 +208,9 @@ public class ProfileUI extends SelectableList {
         profile.setSmiles(smiles.isSelected());
         profile.setHistoryLength(Integer.parseInt(historyLength.getValue().toString()));
         profile.setVolume(Integer.parseInt(volume.getValue().toString()));
+        profile.setVibrate(vibrate.isSelected());
+        profile.setVibrateTime(Integer.parseInt(vibrationTime.getValue().toString()));
+        
         if (profile.getId() == -1) {
             AppStore.getProfileList().addProfile(profile);
         } else {

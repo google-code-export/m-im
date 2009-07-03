@@ -60,7 +60,9 @@ public class ContactListUI extends SelectableList implements
     }
 
     public void refreshView() {
-        setCaption(AppStore.getSelectedProfile().getUserName());
+        //setCaption(AppStore.getSelectedProfile().getUserName());
+    	// Display Name : Profile Name makes more sense here...
+    	setCaption(AppStore.getSelectedProfile().getDisplayName() + " : " + AppStore.getSelectedProfile().getName());
     }
 
     
@@ -80,22 +82,10 @@ public class ContactListUI extends SelectableList implements
     }
 
     public ContactListUI() {
-
-        setLeftCommand(i18n.getMessage("menu"));
-        setRightCommand(i18n.getMessage("disconnect"));
+        
         menu = new Menu(0, i18n.getMessage("menu_select"), i18n.getMessage("menu_cancel"));
-        MenuItem quitItem = new MenuItem(i18n.getMessage("quit"));
-        quitItem.setItemActionListener(new ItemActionListener() {
 
-            public void actionPerformed() {
-                AppStore.getJxa().logoff();
-                BaseMidlet.closeMIDLet();
-            }
-        });
-        menu.addMenuItem(quitItem);
-
-
-        MenuItem statusItem = new MenuItem("Status");
+        MenuItem statusItem = new MenuItem(i18n.getMessage("menu_item_status"));
         statusItem.setItemActionListener(new ItemActionListener() {
 
             public void actionPerformed() {
@@ -108,6 +98,32 @@ public class ContactListUI extends SelectableList implements
             }
         });
         menu.addMenuItem(statusItem);
+
+        MenuItem dissItem = new MenuItem(i18n.getMessage("disconnect"));
+        dissItem.setItemActionListener(new ItemActionListener() {
+
+            public void actionPerformed() {
+                //AppStore.getJxa().logoff();
+                AppStore.getJxa().close();
+                AppStore.setJxa(null);
+                GUIStore.getManager().push(AppStore.getProfileListUI());
+            }
+        });
+        menu.addMenuItem(dissItem);        
+        
+        MenuItem quitItem = new MenuItem(i18n.getMessage("quit"));
+        quitItem.setItemActionListener(new ItemActionListener() {
+
+            public void actionPerformed() {
+                AppStore.getJxa().logoff();
+                BaseMidlet.closeMIDLet();
+            }
+        });
+        menu.addMenuItem(quitItem);        
+
+        setLeftCommand(i18n.getMessage("menu"));
+        setRightCommand(i18n.getMessage("minimise")); //status || minimise
+        
     /*
     AppStore.getNetworkDispatcher().addListener(contactListListener);
     AppStore.getNetworkDispatcher().addListener(newMessagesListener);
@@ -127,9 +143,18 @@ public class ContactListUI extends SelectableList implements
     public boolean rightCommandClick() {
 //        clear();
         //AppStore.getJxa().logoff();
-        AppStore.getJxa().close();
-        AppStore.setJxa(null);
-        GUIStore.getManager().push(AppStore.getProfileListUI());
+        //AppStore.getJxa().close();
+        //AppStore.setJxa(null);
+        //GUIStore.getManager().push(AppStore.getProfileListUI());
+        //return true;
+    	
+    	// Status Change
+        //GUIStore.getManager().push(AppStore.getSharedStatusUI());
+        //GUIStore.getManager().notifyChanged();
+        
+        // Minimise support
+        GUIStore.minimiseApplication();
+        
         return true;
     }
 

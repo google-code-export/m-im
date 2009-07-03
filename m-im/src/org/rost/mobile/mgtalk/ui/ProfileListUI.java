@@ -81,6 +81,7 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
     public void refreshView() {
         //RefreshList
         clear();
+        setCaption(i18n.getMessage("title_profiles"));
         AppStore.getProfileList().refreshList();
         for (int i = 0; i < AppStore.getProfileList().getProfilesCount(); i++) {
             OneLineItem item = new OneLineItem();

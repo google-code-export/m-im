@@ -9,12 +9,12 @@
 package org.rost.mobile.guilib.components;
 
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.TextBox;
+import javax.microedition.lcdui.TextField;
+
 import org.rost.mobile.guilib.core.AdvTextBox;
 import org.rost.mobile.guilib.core.GUIMisc;
-import org.rost.mobile.guilib.core.ItemInterface;
-import org.rost.mobile.guilib.core.BaseMidlet;
 import org.rost.mobile.guilib.core.GUIStore;
+import org.rost.mobile.guilib.core.ItemInterface;
 
 /**
  *
@@ -93,6 +93,7 @@ public class TextBoxItem implements ItemInterface {
 
     public void click() {
         AdvTextBox tb = new AdvTextBox((String) value.getValue(), this);
+        tb.setConstraints(getConstraints());
         GUIStore.getDisplay().setCurrent(tb);
     //Edit text here
     }
@@ -100,4 +101,9 @@ public class TextBoxItem implements ItemInterface {
     public boolean processKeyCode(int keyCode) {
         return false;
     }
+    
+    protected int getConstraints() {
+    	return TextField.ANY;
+    }
+    
 }

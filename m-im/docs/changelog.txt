@@ -1,0 +1,52 @@
+v1.1.0 - Updated release by Mark
+
+	** Application Data NOT backwards compatible with v1.0.0!!!
+	Either uninstall v1.0.0 then install v1.1.0 or answer "No" if 
+	your phone prompts you to keep the existing application data
+
+	New Functionality
+		
+		Customisable "Resource" property for XMPP connection
+		
+		Added "Display Name" to connection profile
+		
+		Added vibrate function for supported handsets (most)
+		
+		Minimise Support - allows running in the background
+		
+		Added user-friendly titles to all screens
+			- Chat with <Remote User Display Name> for ChatUI
+			- Profile Name for ContactListUI, rather than JID
+		
+		Changed right and left click buttons in Contact List and ChatUI
+		
+		Added menu with disconnect and quit options, and put "minimise" 
+		as right click option rather than disconnect
+		
+		Workaround: Added keypress options for 3,6,9 to increase volume 
+		and vibrate times as rightclick isn't working. 
+
+		Restricted port number dialog entry to numbers only
+
+	Known Issues
+		
+		Need to add a method "supportsBackgroundRunning()" which returns
+		true if the phone supports minimise/background running of J2ME
+		applications, and false otherwise. This can then be used to
+		determine whether minimise or another function is assigned
+		to the right screen key on the UI
+
+v1.0.0 - Initial Release uploaded to googlecode by chunlinyao
+	
+	Known Issues
+		
+		A few missing titles, and some UI Strings are hardcoded
+		
+		On S60, right joypad does not increase volume or vibrate time
+		on the slider control, but left click DOES decrease it!
+		
+		When contacts go offline, their status icon changes to red
+		(busy), rather than the grey cross (offline). This means it's
+		hard to distinguish if someone has gone to DND or offline
+		
+		"Error message" dialogue doesn't always dissappear properly

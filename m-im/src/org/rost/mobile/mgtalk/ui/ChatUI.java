@@ -39,7 +39,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
         textBox = new TextBoxItem();
         textBox.getCaption().addText("Type message here:", true, -1);
         setLeftCommand("Send");
-        setRightCommand("Menu");
+        setRightCommand("List");
         history = new UnselectableList();
         contactInfo = new ContactListItem(AppStore.STATUS_OFFLINE, "", "");
     }
@@ -86,6 +86,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     }
 
     public boolean processKeyPress(int keyCode) {
+    	System.out.println("Keypress=" + keyCode);
         if (history.processKeyPress(keyCode)) {
             notifyChanged();
             return true;
@@ -109,6 +110,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     public void refreshView() {
         user.addUserListener(this);
         user.addMessageListener(this);
+        setCaption("Chat with " + user.getUserName());
         //Fill history
         user.setUnreadMessages(0);
         history.clear();

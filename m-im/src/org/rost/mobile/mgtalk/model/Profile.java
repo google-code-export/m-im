@@ -21,9 +21,11 @@ public class Profile {
 
     /** Creates a new instance of Profile */
     protected String userName = "@gmail.com";//
+    protected String displayName = "";
     protected String password = "";//
     protected String host = "talk.google.com";//
     protected String port = "5222";//
+    protected String resource = "Mobile"; // set to the mobile device name if available (see constructor)
     protected String status = "I am here";//
     protected boolean statusActive = false;
     protected String name = "Google talk";
@@ -35,6 +37,8 @@ public class Profile {
     protected boolean moveChattersTop = true;
     protected int statusID = 0;//
     protected int volume = 9;
+    protected boolean vibrate = true;
+    protected int vibrateTime = 8; //default 800ms
     protected int historyLength = 20;
     protected boolean smiles = false;
     protected boolean showOffline = false;
@@ -42,6 +46,12 @@ public class Profile {
     protected int id = -1;
 
     public Profile() {
+    	String meplatform = System.getProperty("microedition.platform");
+    	if (meplatform != null && meplatform.length() > 0) {
+    		int index = meplatform.indexOf('/');
+    		if (index == -1) { index = meplatform.length(); }
+    		resource = meplatform.substring(0, index);
+    	}
     }
 
     public byte[] toByteArray() {
@@ -49,9 +59,11 @@ public class Profile {
         DataOutputStream os = new DataOutputStream(baos);
         try {
             os.writeUTF(userName);
+            os.writeUTF(displayName);
             os.writeUTF(password);
             os.writeUTF(host);
             os.writeUTF(port);
+            os.writeUTF(resource);
             os.writeUTF(status);
             os.writeBoolean(statusActive);
             os.writeUTF(name);
@@ -63,6 +75,8 @@ public class Profile {
             os.writeBoolean(moveChattersTop);
             os.writeInt(statusID);
             os.writeInt(volume);
+            os.writeBoolean(vibrate);
+            os.writeInt(vibrateTime);
             os.writeInt(historyLength);
             os.writeBoolean(smiles);
             os.writeBoolean(showOffline);
@@ -83,9 +97,11 @@ public class Profile {
         try {
             DataInputStream is = new DataInputStream(new ByteArrayInputStream(data));
             userName = is.readUTF();
+            displayName = is.readUTF();
             password = is.readUTF();
             host = is.readUTF();
             port = is.readUTF();
+            resource = is.readUTF();
             status = is.readUTF();
             statusActive = is.readBoolean();
             name = is.readUTF();
@@ -97,6 +113,8 @@ public class Profile {
             moveChattersTop = is.readBoolean();
             statusID = is.readInt();
             volume = is.readInt();
+            vibrate = is.readBoolean();
+            vibrateTime = is.readInt();
             historyLength = is.readInt();
             smiles = is.readBoolean();
             showOffline = is.readBoolean();
@@ -116,6 +134,14 @@ public class Profile {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 
     public String getPassword() {
         return password;
@@ -140,6 +166,14 @@ public class Profile {
     public void setPort(String port) {
         this.port = port;
     }
+
+    public String getResource() {
+		return resource;
+	}
+
+	public void setResource(String resource) {
+		this.resource = resource;
+	}
 
     public String getStatus() {
         return status;
@@ -221,6 +255,22 @@ public class Profile {
     public void setVolume(int volume) {
         this.volume = volume;
     }
+
+    public boolean isVibrate() {
+		return vibrate;
+	}
+
+	public void setVibrate(boolean vibrate) {
+		this.vibrate = vibrate;
+	}
+
+	public int getVibrateTime() {
+		return vibrateTime;
+	}
+
+	public void setVibrateTime(int vibrateTime) {
+		this.vibrateTime = vibrateTime;
+	}
 
     public int getHistoryLength() {
         return historyLength;

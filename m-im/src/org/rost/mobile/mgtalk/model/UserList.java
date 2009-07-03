@@ -9,6 +9,9 @@
 package org.rost.mobile.mgtalk.model;
 
 import java.util.Vector;
+
+import javax.microedition.lcdui.Display;
+
 import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.mgtalk.AppStore;
 
@@ -200,8 +203,12 @@ public class UserList implements UserStateListener, UserMessageListener {
         if (from) {
             user.setUnreadMessages(user.getUnreadMessages() + 1);
             AppStore.playMessage();
+            if (AppStore.getSelectedProfile().isVibrate()) {
+            	AppStore.vibrate();
+            }
             AppStore.getInfoTicker().setMessage("New message from " + user.getUserName());
         }
         return true;
     }
+    
 }

@@ -1,0 +1,9 @@
+MIDlet-1: m-im,icon.png,org.rost.mobile.mgtalk.Starter
+MIDlet-Info-URL: http://code.google.com/p/m-im/
+MIDlet-Jar-Size: 71935
+MIDlet-Jar-URL: m-im.jar
+MIDlet-Name: m-im
+MIDlet-Vendor: M-IM Team
+MIDlet-Version: 1.0.0
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0

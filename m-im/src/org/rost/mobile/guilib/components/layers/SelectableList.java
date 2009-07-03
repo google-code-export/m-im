@@ -164,6 +164,10 @@ public class SelectableList extends LayerInterface {
                 notifyChanged();
 
                 return true;
+                
+            case -4:
+            	// Right (next)
+            	return selectCommandClick();
         }
         try {
             ItemInterface ii = (ItemInterface) items.elementAt(currentSelected);

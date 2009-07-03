@@ -8,6 +8,7 @@
  */
 package org.rost.mobile.guilib.components;
 
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import org.rost.mobile.guilib.core.GUIMisc;
@@ -100,18 +101,43 @@ public class TrackItem implements ItemInterface {
     public boolean processKeyCode(int keyCode) {
         switch (keyCode) {
             case -3:
-                if (currValue > 0) {
-                    currValue--;
-                }
-                GUIStore.getCanvas().repaint();
-                return true;
+            	return decrement();
             case -4:
-                if (currValue < maxValue - 1) {
-                    currValue++;
-                }
-                GUIStore.getCanvas().repaint();
-                return true;
+            	return increment();
+            case 105:
+            	return increment();
+            case 107:
+            	return decrement();
+            case Canvas.KEY_NUM3:
+            	return increment();
+            case Canvas.KEY_NUM6:
+            	return increment();
+            case Canvas.KEY_NUM9:
+            	return increment();
+            case Canvas.KEY_NUM1:
+            	return decrement();
+            case Canvas.KEY_NUM4:
+            	return decrement();
+            case Canvas.KEY_NUM7:
+            	return decrement();
         }
         return false;
     }
+    
+    private boolean decrement() {
+        if (currValue > 0) {
+            currValue--;
+        }
+        GUIStore.getCanvas().repaint();
+        return true;
+    }
+    
+    private boolean increment() {
+        if (currValue < maxValue - 1) {
+            currValue++;
+        }
+        GUIStore.getCanvas().repaint();
+        return true;
+    }
+    
 }

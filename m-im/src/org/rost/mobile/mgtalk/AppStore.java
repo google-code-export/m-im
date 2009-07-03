@@ -13,7 +13,9 @@ import javax.microedition.media.Control;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.VolumeControl;
+
 import net.sourceforge.jxa.Jxa;
+
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.Profile;
@@ -156,7 +158,8 @@ public class AppStore {
     public static void playMessage() {
         try {
             if (p == null) {
-                p = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "ring.mid"), "audio/midi");
+                //p = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "ring.mid"), "audio/midi");
+            	p = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "pidgin-receive.amr"), "audio/amr");
             }
             if (p.getState() != Player.STARTED) {
                 p.realize();
@@ -180,6 +183,11 @@ public class AppStore {
         }
     }
 
+    public static void vibrate() {
+    	//GUIStore.getDisplay().vibrate(800);
+    	GUIStore.getDisplay().vibrate(AppStore.getSelectedProfile().getVibrateTime() * 100);
+    }
+    
     public static SharedStatusUI getSharedStatusUI() {
         return sharedStatusUI;
     }
@@ -189,6 +197,6 @@ public class AppStore {
             jxa.close();
         }
         final Profile profile = getSelectedProfile();
-        jxa = new Jxa(profile.getFullJID(), profile.getPassword(), "Mobile", 10, profile.getHost(), profile.getPort(), profile.isSSL());
+        jxa = new Jxa(profile.getFullJID(), profile.getPassword(), profile.getResource(), 10, profile.getHost(), profile.getPort(), profile.isSSL());
     }
 }
