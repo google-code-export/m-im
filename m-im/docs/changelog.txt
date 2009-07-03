@@ -1,3 +1,14 @@
+v1.3.0 - in progress.. 
+	I'm currently working on this one... I've merged in the changes I've made section-by-section
+	and tagged it at each stage, so it's not all checked in as one massive change list! 
+
+	I run my own IM servers, so I can do things such as kicking my phone off the server by forcibly closing the connection
+	As a result, I've discovered that the "Auto-Reconnect" options aren't working very gracefully
+	I have implemented some new logic for handling the automatic reconnection of the socket, which appears to be working
+	quite nicely. Once I'm happy it's stable and doesn't adversely affect anything, I'll merge and commit that change as 1.3.0
+	
+	It's probably a safe bet to do some translating if you get half a chance, as I doubt I'll add any new translations in 1.3.0
+	
 v1.2.0 - Updated release by Mark
 
 	** Application Data NOT backwards compatible with v1.1.0!!!
