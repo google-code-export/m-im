@@ -82,7 +82,7 @@ public class Base64 {
     private static final int TWENTYFOURBITGROUP = 24;
     private static final int EIGHTBIT = 8;
     private static final int SIXTEENBIT = 16;
-    private static final int SIXBIT = 6;
+    //private static final int SIXBIT = 6;
     private static final int FOURBYTE = 4;
     private static final int SIGN = -128;
     private static final byte PAD = (byte) '=';

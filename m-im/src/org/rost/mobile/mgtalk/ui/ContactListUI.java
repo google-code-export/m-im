@@ -18,6 +18,7 @@ import org.rost.mobile.guilib.components.MenuItem;
 import org.rost.mobile.guilib.components.layers.Menu;
 import org.rost.mobile.guilib.components.layers.SelectableList;
 import org.rost.mobile.guilib.core.BaseMidlet;
+import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.guilib.core.ItemActionListener;
 import org.rost.mobile.mgtalk.AppStore;
@@ -27,6 +28,9 @@ import org.rost.mobile.mgtalk.model.Profile;
 import org.rost.mobile.mgtalk.model.User;
 import org.rost.mobile.mgtalk.model.UserAddedListener;
 import org.rost.mobile.mgtalk.model.UserDeletedListener;
+import org.rost.mobile.mgtalk.model.UserList;
+
+import com.google.code.mim.Log;
 
 /**
  *
@@ -208,10 +212,14 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
     }
 
     public void userAdded(int userPosition) {
-//        System.out.println("Added user in "+userPosition+", user = "+
-//                AppStore.getContactList().getUserAt(userPosition).getUserName()+" status = "+
-//                AppStore.getContactList().getUserAt(userPosition).getStatus()+", statusID = "+
-//                AppStore.getContactList().getUserAt(userPosition).getStatusID());
+    	if (Constants.LOGGING) {
+    		UserList list = AppStore.getContactList();
+        	Log.debug("Added user in "+userPosition+", user = "+
+        			list.getUserAt(userPosition).getUserName()+" status = "+
+        			list.getUserAt(userPosition).getStatus()+", statusID = "+
+        			list.getUserAt(userPosition).getStatusID());
+    	}
+    	
         User user = AppStore.getContactList().getUserAt(userPosition);
         ContactListItem item = new ContactListItem(
                 statusIDToImage(user.getStatusID()),
@@ -222,7 +230,9 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
     }
 
     public void userDeleted(int userPosition) {
-       // System.out.println("Deleted user in " + userPosition);
+    	if (Constants.LOGGING) {
+    		Log.debug("Deleted user in " + userPosition);
+    	}
         removeItem(userPosition);
     }
 

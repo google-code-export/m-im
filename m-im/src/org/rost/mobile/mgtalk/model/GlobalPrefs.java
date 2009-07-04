@@ -10,6 +10,10 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import org.rost.mobile.guilib.core.Constants;
+
+import com.google.code.mim.Log;
+
 /**
  * Global Preferences which are used for each newly created profile.
  * Arguably Profile should have an "override" setting to inherit then change each of these
@@ -125,16 +129,22 @@ public class GlobalPrefs {
             //store.addRecord(prefsData, 0, prefsData.length);
             store.addRecord(prefsData, 0, 512);
         } catch (Throwable t) {
-        	System.out.println("Error saving global prefs!" + t);
-        	t.printStackTrace();
+        	if (Constants.LOGGING) {
+            	Log.info("Error saving global prefs!" + t);
+            	t.printStackTrace();
+        	}
         } finally {
         	if (store != null) {
         		try {
        				store.closeRecordStore();
 				} catch (RecordStoreNotOpenException e) {
-					e.printStackTrace();
+					if (Constants.LOGGING) {
+						e.printStackTrace();
+					}
 				} catch (RecordStoreException e) {
-					e.printStackTrace();
+					if (Constants.LOGGING) {
+                    	e.printStackTrace();
+					}
 				}
         	}        	
         }

@@ -9,16 +9,13 @@
 package org.rost.mobile.guilib.components.layers;
 
 import java.util.Vector;
+
 import javax.microedition.lcdui.Graphics;
-import org.rost.mobile.guilib.components.MenuItem;
-import org.rost.mobile.guilib.components.SubMenuItem;
+
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.GUIStore;
-import org.rost.mobile.guilib.core.ItemActionListener;
 import org.rost.mobile.guilib.core.ItemInterface;
 import org.rost.mobile.guilib.core.LayerInterface;
-import org.rost.mobile.guilib.core.BaseCanvas;
-import org.rost.mobile.guilib.core.BaseMidlet;
 
 /**
  *

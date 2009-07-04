@@ -1,11 +1,13 @@
 package org.rost.mobile.mgtalk.utils;
 
-import com.sun.kvem.netmon.InputStreamStealer;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import org.rost.mobile.guilib.core.Constants;
+
+import com.google.code.mim.Log;
 
 /**
  *
@@ -38,7 +40,7 @@ public class XmlNode {
         }
         {
             j &= 0xff;
-            boolean flag = false;
+            //boolean flag = false;
             switch (j >> 4) {
                 case 8: // '\b'
                 case 9: // '\t'
@@ -102,17 +104,19 @@ public class XmlNode {
                     }
                 } while (!ok);
                 buff += (char) ccc;
-                System.err.print((char) ccc);
-//				System.out.print(ccc);
+                if (Constants.LOGGING) {
+                	Log.info("nextChar() error: " + (char) ccc);
+                }
             }
             char ch = buff.charAt(pos++);
             if (ch == -1) {
-                System.out.println("conn closed");
+            	if (Constants.LOGGING) {
+                	Log.info("conn closed");
+            	}
                 throw new Exception("Conn closed");
             }
             return ch;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             throw new Exception("nextChar buff = " + buff + ", pos = " + pos + ": " + e.toString());
         }
     }
@@ -144,14 +148,12 @@ public class XmlNode {
             while ((ch = nextChar()) != '>') {
                 n += ch;
             }
-//			System.out.println("name = "+n);
             boolean hasEnd = false;
             if (n.charAt(n.length() - 1) == '/') {
                 hasEnd = true;
                 n = n.substring(0, n.length() - 1);
             }
             if (n.indexOf(' ') != -1) {
-//				System.out.println("has attr");
                 String attrs = n.substring(n.indexOf(' '), n.length()).trim() + ' ';
                 n = n.substring(0, n.indexOf(' '));
                 for (; attrs.length() > 1;) {
@@ -160,7 +162,6 @@ public class XmlNode {
                     char b = attrs.charAt(0);
                     String aValue = attrs.substring(1, attrs.indexOf(b, 1));
                     attrs = attrs.substring(attrs.indexOf(b, 1) + 2, attrs.length());
-                    //				System.out.println(n+":"+aName+" = "+aValue);
                     attributes.put(aName, aValue);
                 }
             }
@@ -190,10 +191,8 @@ public class XmlNode {
 //					setValue(value);
                 }
             }
-//			System.out.println("Name = "+name+", value = "+value+", attrs = "+attributes.size()+", childs = "+childs.size());
         //Read data
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             throw new Exception("Could not read: " + e);
         }
     }

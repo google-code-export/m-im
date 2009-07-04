@@ -10,7 +10,7 @@ package org.rost.mobile.mgtalk.model;
 
 import java.util.Calendar;
 import java.util.Vector;
-import javax.wireless.messaging.MessageListener;
+
 import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.mgtalk.AppStore;
 
@@ -100,7 +100,7 @@ public class User {
     }
 
     void refreshStatus() {
-        String outp = "";
+        //String outp = "";
         int minStatus = 5;
         int ind = -1;
         boolean changed = false;

@@ -9,8 +9,8 @@
 package org.rost.mobile.guilib.components;
 
 import javax.microedition.lcdui.Image;
+
 import org.rost.mobile.guilib.components.layers.Menu;
-import org.rost.mobile.guilib.core.BaseCanvas;
 import org.rost.mobile.guilib.core.GUIStore;
 
 /**

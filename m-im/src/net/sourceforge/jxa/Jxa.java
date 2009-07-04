@@ -193,7 +193,12 @@ public class Jxa extends Thread {
                 if (Constants.LOGGING) {
                 	Log.debug("jxa.run complete..");
                 }
-                // If this gets to this stage, it's probably due to a disconnect!!??
+                /*
+                 * MarkM - If this gets to this stage, it's probably due to a disconnect!!??
+                 * What I've found is if you kick/close the connection on the server, it drops out of the parse
+                 * method and returns control to this point. If the network itself goes down, something different 
+                 * happens, perhaps throwing the Exception caught below?? Not sure who added that German comment?
+                 */
             } catch (final Exception e) {
                 // hier entsteht der connection failed bug (Network Down)
             	hasBeenDisconnected = true;
@@ -808,7 +813,9 @@ public class Jxa extends Thread {
                                 type = this.reader.getAttribute("type");
                                 String jid = reader.getAttribute("jid");
                                 String name = reader.getAttribute("name");
-                                //System.out.println(jid + name);
+                                if (Constants.LOGGING) {
+                                	Log.info(jid + name);
+                                }
                                 String subscription = reader.getAttribute("subscription");
                                 //newjid = (jid.indexOf('/') == -1) ? jid : jid.substring(0, jid.indexOf('/'));
                                 boolean check = true;
@@ -839,7 +846,9 @@ public class Jxa extends Thread {
                             } else {
                                 this.parseIgnore();
                             }
-                        //System.out.println(this.reader.getName() + reader.getType());
+                            if (Constants.LOGGING) {
+                            	Log.info(this.reader.getName() + reader.getType());
+                            }
                         }
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                             XmppListener xl = (XmppListener) e.nextElement();
@@ -894,7 +903,6 @@ public class Jxa extends Thread {
                             }
                         }
 
-                        //System.out.println();
                         //System.out.println(this.reader.getName() + this.reader.getType());
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
                             XmppListener xl = (XmppListener) e.nextElement();
@@ -953,8 +961,8 @@ public class Jxa extends Thread {
             }
         }
 
-        if (DEBUG) {
-            //java.lang.System.out.println("*debug* from,type,status,show:" + from + "," + type + "," + status + "," + show);
+        if (Constants.LOGGING) {
+        	Log.debug("*debug* from,type,status,show:" + from + "," + type + "," + status + "," + show);
         }
 
         //if ((type != null) && (type.equals("unavailable") || type.equals("unsubscribed") || type.equals("error"))) {

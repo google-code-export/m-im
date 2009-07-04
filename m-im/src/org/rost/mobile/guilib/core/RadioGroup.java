@@ -11,6 +11,8 @@ package org.rost.mobile.guilib.core;
 import java.util.Vector;
 import org.rost.mobile.guilib.components.CheckBoxItem;
 
+import com.google.code.mim.Log;
+
 /**
  *
  * @author Kostya
@@ -38,7 +40,9 @@ public class RadioGroup implements ItemActionListener {
     }
 
     public void setValue(int value) {
-        //System.out.println("Value = " + value);
+    	if (Constants.LOGGING) {
+        	Log.info("Value = " + value);
+    	}
         for (int i = 0; i < items.size(); i++) {
             CheckBoxItem item = (CheckBoxItem) items.elementAt(i);
             item.setSelected(value == i);

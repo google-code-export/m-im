@@ -12,6 +12,7 @@ import javax.microedition.lcdui.Graphics;
 import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.guilib.components.TextBoxItem;
 import org.rost.mobile.guilib.components.layers.*;
+import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.ItemInterface;
 import org.rost.mobile.guilib.core.LayerInterface;
@@ -21,6 +22,8 @@ import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.User;
 import org.rost.mobile.mgtalk.model.UserMessageListener;
 import org.rost.mobile.mgtalk.model.UserStateListener;
+
+import com.google.code.mim.Log;
 
 /**
  *
@@ -87,7 +90,9 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     }
 
     public boolean processKeyPress(int keyCode) {
-    	System.out.println("Keypress=" + keyCode);
+    	if (Constants.LOGGING) {
+        	Log.debug("Keypress=" + keyCode);
+    	}
         if (history.processKeyPress(keyCode)) {
             notifyChanged();
             return true;
@@ -140,7 +145,9 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
         if (from) {
             AppStore.notifyMessage();
         }
-        //System.out.println("New message!");
+        if (Constants.LOGGING) {
+        	Log.debug("New message!");
+        }
         history.pushItemFront(item);
         history.setCurrentPosition(0);
         notifyChanged();

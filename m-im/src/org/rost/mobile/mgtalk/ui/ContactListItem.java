@@ -8,9 +8,9 @@
  */
 package org.rost.mobile.mgtalk.ui;
 
-import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+
 import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.ItemActionListener;

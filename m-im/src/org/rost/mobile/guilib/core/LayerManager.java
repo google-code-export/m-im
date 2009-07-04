@@ -9,9 +9,9 @@
 package org.rost.mobile.guilib.core;
 
 import java.util.Vector;
+
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
-import org.rost.mobile.mgtalk.AppStore;
 
 /**
  *

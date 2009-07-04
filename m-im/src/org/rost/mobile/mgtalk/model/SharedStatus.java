@@ -54,7 +54,7 @@ public class SharedStatus extends XmppAdapter {
     }
 
     public void sendStatusStanza() {
-        StringBuffer sb = new StringBuffer();
+        //StringBuffer sb = new StringBuffer();
         if (AppStore.getSelectedProfile().isStatusActive()) {
             status = AppStore.getSelectedProfile().getStatus();
         }

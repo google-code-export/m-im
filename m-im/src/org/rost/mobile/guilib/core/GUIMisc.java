@@ -8,13 +8,9 @@
  */
 package org.rost.mobile.guilib.core;
 
-import com.sun.midp.dev.GraphicalInstaller;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
-import org.rost.mobile.mgtalk.model.UserList;
-import org.rost.mobile.mgtalk.ui.ContactListItem;
-import org.rost.mobile.mgtalk.ui.ContactListUI;
 
 /**
  *
@@ -116,7 +112,7 @@ public class GUIMisc {
     public static void drawLeftCommand(Graphics g, String val) {
         g.setColor(textColor);
         g.setFont(getBoldFont());
-        int tw = getBoldFont().stringWidth(val);
+        //int tw = getBoldFont().stringWidth(val);
         g.drawString(val, 2, scHeight, Graphics.LEFT | Graphics.BOTTOM);
     }
 

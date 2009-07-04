@@ -9,7 +9,6 @@
 package org.rost.mobile.guilib.components;
 
 import org.rost.mobile.guilib.components.layers.Menu;
-import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.ItemActionListener;
 
 /**

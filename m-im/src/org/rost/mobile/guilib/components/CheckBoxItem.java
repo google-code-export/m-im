@@ -9,8 +9,9 @@
 package org.rost.mobile.guilib.components;
 
 import java.io.IOException;
-import javax.microedition.lcdui.Graphics;
+
 import javax.microedition.lcdui.Image;
+
 import org.rost.mobile.guilib.core.GUIMisc;
 import org.rost.mobile.guilib.core.GUIStore;
 

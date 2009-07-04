@@ -11,14 +11,12 @@ package org.rost.mobile.mgtalk.ui;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+
 import javax.microedition.lcdui.Graphics;
-import org.rost.mobile.guilib.components.OneLineItem;
+
 import org.rost.mobile.guilib.components.StaticRichText;
-import org.rost.mobile.guilib.core.BaseMidlet;
 import org.rost.mobile.guilib.core.GUIMisc;
-import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.guilib.core.LayerInterface;
-import org.rost.mobile.mgtalk.AppStore;
 
 /**
  *
@@ -59,7 +57,6 @@ public class InfoTicker extends LayerInterface {
     }
 
     synchronized public void setMessage(String message) {
-//	System.out.println("Message = "+message);
         if (taskStarted) {
             messages.addElement(message);
         } else {
