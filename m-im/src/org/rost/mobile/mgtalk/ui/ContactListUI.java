@@ -121,7 +121,6 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
             	} else {
             		gp.setSoundEnabled(true);
             	}
-            	//gp.setSoundEnabled(soundEnabled ? false : true);
             }
         });
         menu.addMenuItem(muteItem);        
@@ -143,6 +142,8 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
 
             public void actionPerformed() {
                 AppStore.getJxa().logoff();
+                AppStore.getJxa().close();
+                AppStore.setJxa(null);
                 BaseMidlet.closeMIDLet();
             }
         });

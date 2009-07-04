@@ -8,6 +8,8 @@ package org.rost.mobile.guilib.core;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 
+import org.rost.mobile.mgtalk.AppStore;
+
 /**
  *
  * @author  Kostya
@@ -31,6 +33,7 @@ abstract public class BaseMidlet extends MIDlet {
         GUIStore.getDisplay().setCurrent(splash);
         appStarted();
         GUIStore.getDisplay().setCurrent(tc);
+        Constants.init();
     }
 
     abstract public void appStarted();
@@ -43,6 +46,15 @@ abstract public class BaseMidlet extends MIDlet {
     }
 
     public void destroyApp(boolean unconditional) {
+    	// Close down anything in the AppStore which needs to be
+    	AppStore.close();
+    	try {
+    		// Sometimes this takes a few hundred millis, just give it half a second to close gracefully
+    		// this isn't noticeable by the user, but does help the app close down properly more often
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
     }
 
     public static void closeMIDLet() {

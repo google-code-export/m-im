@@ -1,3 +1,16 @@
 Allow show/hide of "Transports" on the buddy list
 
 Allow switch to show-hide status on the buddy list
+
+Lock screen for S40 - a la JIMM IM
+
+Implement "show status" and "get info" functions in contact list
+
+Allow "popup" (bring to front) when minimised upon new message and/or errors (options required for these functions)
+
+Check smilies, not sure they're actually implemented despite the being a menu option for them?
+
+Options for:
+Confirm before send or "instant send" of new messages
+
+Can we map the volume up and down keys? Keycodes don't appear to be passed through

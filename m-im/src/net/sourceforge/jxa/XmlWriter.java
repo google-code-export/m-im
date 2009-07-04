@@ -14,8 +14,12 @@
  */
 package net.sourceforge.jxa;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.EmptyStackException;
+import java.util.Stack;
 
 /**
  * XML-Writer
@@ -96,8 +100,11 @@ public class XmlWriter {
         this.writeEscaped(str);
     }
 
+    /*
+     * Not sure if it was this method, but something was escaping ' as "'" which showed up strangely on my PC's client (Pidgin)
+     */
     private void writeEscaped(final String str) throws IOException {
-        final int index = 0;
+        //final int index = 0;
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
             switch (c) {

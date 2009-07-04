@@ -15,11 +15,23 @@
  */
 package net.sourceforge.jxa;
 
-import javax.microedition.io.*;
-import java.io.*;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import javax.microedition.io.Connector;
+import javax.microedition.io.HttpsConnection;
+import javax.microedition.io.SocketConnection;
 import javax.microedition.pki.CertificateException;
+
+import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.mgtalk.AppStore;
+import org.rost.mobile.mgtalk.model.Profile;
+
+import com.google.code.mim.Log;
 
 /**
  * J2ME XMPP API Class
@@ -42,6 +54,16 @@ public class Jxa extends Thread {
     private SocketConnection connection;
     private Vector listeners = new Vector();
     private String googleToken = "";
+
+    private boolean connected = false;
+    
+    public boolean isConnected() {
+		return connected;
+	}
+
+	public void setConnected(boolean connected) {
+		this.connected = connected;
+	}
 
     /**
      * If you create this object all variables will be saved and the
@@ -99,6 +121,7 @@ public class Jxa extends Thread {
         } catch (Exception e) {
         }
         try {
+            this.connected = false;
             this.connection.close();
         } catch (Exception e) {
         }
@@ -129,6 +152,65 @@ public class Jxa extends Thread {
      * methode and listens on the reader to parse incomming xml stanzas.
      */
     public void run() {
+
+    	connected = true;// when called, we should attempt a connection!
+    	boolean hasBeenDisconnected = false;
+    	boolean loginOK = true;
+    	
+    	Profile activeProfile = AppStore.getSelectedProfile();
+    	
+    	while (connected && loginOK) {
+    		if (hasBeenDisconnected) {
+    			if (!activeProfile.isAutoReconnect()) {
+    				break; // break out of this loop if we're not supposed to auto-reconnect!
+    			}
+				hasBeenDisconnected = false; //reset this
+    		}
+        	connect();
+        	try {
+        		if (Constants.LOGGING) {
+        			Log.debug("logging in..");
+        		}
+            	loginOK = login();
+        	} catch (IOException e) {
+        		if (Constants.LOGGING) {
+        			Log.error("Login Error", e);
+        		}
+        	}
+        	if (Constants.LOGGING) {
+        		Log.debug("login " + (loginOK ? "ok" : "failed!"));
+        	}
+
+        try {
+        		if (activeProfile.isKeepalive() && activeProfile.isXmppPing()) {
+        			AppStore.startPinger();
+        		}
+                if (Constants.LOGGING) {
+                	Log.debug("parsing...");
+                }
+                this.parse();
+                hasBeenDisconnected = true;
+                if (Constants.LOGGING) {
+                	Log.debug("jxa.run complete..");
+                }
+                // If this gets to this stage, it's probably due to a disconnect!!??
+            } catch (final Exception e) {
+                // hier entsteht der connection failed bug (Network Down)
+            	hasBeenDisconnected = true;
+            	if (Constants.LOGGING) {
+            		Log.error("ConnFailed", e);
+            	}
+                this.connectionFailed(e.getMessage());
+                e.printStackTrace();
+            } finally {
+            	if (activeProfile.isXmppPing()) {
+            		AppStore.stopPinger();
+            	}
+            }    		
+    	}
+    }
+
+    private void connect() {
         try {
             if (!use_ssl) {
                 connection = (SocketConnection) Connector.open("socket://" + this.server + ":" + this.port, Connector.READ_WRITE);
@@ -140,50 +222,25 @@ public class Jxa extends Thread {
                 this.writer = new XmlWriter(os);
             } else {
                 connection = (SocketConnection) Connector.open("ssl://" + this.server + ":" + this.port, Connector.READ_WRITE);
+                connection.setSocketOption(SocketConnection.KEEPALIVE, 1);
                 //sc.setSocketOption(SocketConnection.DELAY, 1);
                 //sc.setSocketOption(SocketConnection.LINGER, 0);
-                connection.setSocketOption(SocketConnection.KEEPALIVE, 1);
                 is = connection.openInputStream();
                 os = connection.openOutputStream();
                 this.reader = new XmlReader(is);
                 this.writer = new XmlWriter(os);
             }
+        	connected = true;
         } catch (final CertificateException ex) {
-            //java.lang.System.out.println(ex);
+        	if (Constants.LOGGING) {
+        		Log.error("CertificateException", ex);
+        	}
             this.connectionFailed(ex.getReason() + ex.getMessage());
-            return;
         } catch (final Exception e) {
-            //java.lang.System.out.println(e);
+        	if (Constants.LOGGING) {
+        		Log.error("Connection Failed", e);
+        	}
             this.connectionFailed(e.getMessage());
-            return;
-        }
-
-        //java.lang.System.out.println("connected");
-        /*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
-        XmppListener xl = (XmppListener) enu.nextElement();
-        xl.onDebug("connected");
-        }*/
-
-        // connected
-        try {
-            this.login();
-            this.parse();
-        //java.lang.System.out.println("done");
-        } catch (final Exception e) {
-            //e.printStackTrace();
-			/*for (Enumeration enu = listeners.elements(); enu.hasMoreElements();) {
-            XmppListener xl = (XmppListener) enu.nextElement();
-            xl.onDebug(e.getMessage());
-            }*/
-            /*try {
-            this.writer.close();
-            this.reader.close();
-            } catch (final IOException io) {
-            io.printStackTrace();
-            }*/
-            // hier entsteht der connection failed bug (Network Down)
-            this.connectionFailed(e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -214,7 +271,7 @@ public class Jxa extends Thread {
      * @throws java.io.IOException is thrown if {@link XmlReader} or {@link XmlWriter}
      *	throw an IOException.
      */
-    public synchronized void login() throws IOException {
+    public synchronized boolean login() throws IOException {
         //if (!use_ssl) {
         /*
         // start stream
@@ -251,7 +308,7 @@ public class Jxa extends Thread {
         Vector mechanisms = new Vector();
         do {
             reader.next();
-            if (reader.getType() == reader.START_TAG &&
+            if (reader.getType() == XmlReader.START_TAG &&
                     "mechanisms".equals(reader.getName()) &&
                     "urn:ietf:params:xml:ns:xmpp-sasl".equals(reader.getAttribute("xmlns"))) {
                 fillMechanisms(mechanisms);
@@ -307,7 +364,7 @@ public class Jxa extends Thread {
                 XmppListener xl = (XmppListener) e.nextElement();
                 xl.onAuthFailed(reader.getName() + ", failed authentication");
             }
-            return;
+            return false;
         }
 
         //java.lang.System.out.println("SASL phase2");
@@ -337,7 +394,8 @@ public class Jxa extends Thread {
         }
         os.write(msg.getBytes());
         os.flush();
-    //}
+
+        return loginSuccess;
     }
 
     private void fillMechanisms(Vector mechanisms) {
@@ -934,14 +992,15 @@ public class Jxa extends Thread {
      *	throw an IOException.
      */
     private void parseMessage() throws IOException {
-        final String from = this.reader.getAttribute("from"),  type = this.reader.getAttribute("type");
-        String body = null, subject = null;
+        final String from = this.reader.getAttribute("from");
+        //final String type = this.reader.getAttribute("type");
+        String body = null; //, subject = null;
         while (this.reader.next() == XmlReader.START_TAG) {
             final String tmp = this.reader.getName();
             if (tmp.equals("body")) {
                 body = this.parseText();
-            } else if (tmp.equals("subject")) {
-                subject = this.parseText();
+//            } else if (tmp.equals("subject")) {
+//                subject = this.parseText(); // this is checked for, but never used!
             } else {
                 this.parseIgnore();
             }

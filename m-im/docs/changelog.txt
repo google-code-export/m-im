@@ -9,6 +9,14 @@ v1.3.0 - in progress..
 	
 	It's probably a safe bet to do some translating if you get half a chance, as I doubt I'll add any new translations in 1.3.0
 	
+	Changes:
+	Added Log class to centralise calls to System.out etc
+	Changed XmppPinger class to use Constants to determine whether to ping every 30 seconds or 5 minutes (DEBUG related)
+	New logic in Jxa to handle disconnections more gracefully. If the server drops the connection, but the underlying network
+	stays up, this is now handled gracefully. If the network (Wifi etc) disconnects, this still resorts to a Symbian OS error on S60
+	A couple of code optimisations (removing unused variables etc)
+	
+	
 v1.2.0 - Updated release by Mark
 
 	** Application Data NOT backwards compatible with v1.1.0!!!

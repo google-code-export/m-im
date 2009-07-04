@@ -32,7 +32,7 @@ public class XmlReader {
     public final static int START_TAG = 2;
     public final static int END_TAG = 3;
     public final static int TEXT = 4;
-    private Stack tags;
+    //private Stack tags;
     private boolean inside_tag;
     private String tagName;
     private String text;
@@ -44,7 +44,7 @@ public class XmlReader {
     public XmlReader(final InputStream in) throws IOException {
         //reader = new InputStreamReader(in, "UTF-8");
         this.is = in;
-        this.tags = new Stack();
+        //this.tags = new Stack();
         this.inside_tag = false;
     }
 
