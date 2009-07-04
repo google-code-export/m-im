@@ -116,6 +116,9 @@ public class Jxa extends Thread {
     }
 
     public void close(String msg) {
+    	if (Constants.LOGGING) {
+    		Log.info("Jxa.close(" + msg + ") called");
+    	}
         try {
             this.interrupt();
         } catch (Exception e) {
@@ -458,6 +461,9 @@ public class Jxa extends Thread {
             this.writer.endTag();
             this.writer.endTag();
             this.writer.flush();
+            if (Constants.LOGGING) {
+            	Log.debug("Sent ping with id " + id);
+            }
         } catch (final Exception e) {
             this.connectionFailed(e.getMessage());
         }    	

@@ -10,6 +10,8 @@ import javax.microedition.lcdui.*;
 
 import org.rost.mobile.mgtalk.AppStore;
 
+import com.google.code.mim.Log;
+
 /**
  *
  * @author  Kostya
@@ -21,6 +23,10 @@ abstract public class BaseMidlet extends MIDlet {
     boolean started = false;
     protected BaseSplash splash = new BaseSplash();
 
+    public BaseMidlet() {
+    	
+    }
+    
     public void startApp() {
         if (started) {
             return;
@@ -34,6 +40,9 @@ abstract public class BaseMidlet extends MIDlet {
         appStarted();
         GUIStore.getDisplay().setCurrent(tc);
         Constants.init();
+        if (Constants.LOGGING) {
+        	Log.debug("Screen Resolution is " + Constants.screenWidth + "x" + Constants.screenHeight);
+    	}
     }
 
     abstract public void appStarted();

@@ -160,6 +160,9 @@ public class GlobalPrefs {
     		// didn't exist, not really a problem - it will be created on save()
         } catch (Exception e) {
         	// oops, some other error!
+        	if (Constants.LOGGING) {
+        		Log.error("RS Error", e);
+        	}
         } finally {
         	if (store != null) {
         		try {

@@ -251,6 +251,9 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
     }
 
     public void onConnFailed(String msg) {
+    	if (Constants.LOGGING) {
+    		Log.info("CLUI.onConnFailed(" + msg + ") called");
+    	}
         connectionTerminated(msg);
     }
 

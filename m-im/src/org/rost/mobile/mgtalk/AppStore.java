@@ -17,6 +17,7 @@ import javax.microedition.media.control.VolumeControl;
 
 import net.sourceforge.jxa.Jxa;
 
+import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.GlobalPrefs;
@@ -33,6 +34,7 @@ import org.rost.mobile.mgtalk.ui.ProfileListUI;
 import org.rost.mobile.mgtalk.ui.ProfileUI;
 import org.rost.mobile.mgtalk.ui.SharedStatusUI;
 
+import com.google.code.mim.Log;
 import com.google.code.mim.XmppPinger;
 
 /**
@@ -116,6 +118,9 @@ public class AppStore {
     
     /** Creates a new instance of AppStore */
     public static void initApp() {
+    	if (Constants.LOGGING) {
+    		Log.info("initApp");
+    	}
         try {
             STATUS_ONLINE = Image.createImage(IMAGE_PREFIX + "status_avail.png");
             STATUS_AWAY = Image.createImage(IMAGE_PREFIX + "status_idle.png");
@@ -290,6 +295,9 @@ public class AppStore {
             jxa.close();
         }
         final Profile profile = getSelectedProfile();
+        if (Constants.LOGGING) {
+        	Log.info("initialising Jxa...");
+        }
         jxa = new Jxa(profile.getFullJID(), profile.getPassword(), profile.getResource(), 10, profile.getHost(), profile.getPort(), profile.isSSL());
     }
     
