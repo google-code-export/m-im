@@ -14,3 +14,22 @@ Options for:
 Confirm before send or "instant send" of new messages
 
 Can we map the volume up and down keys? Keycodes don't appear to be passed through
+
+Limit text input fields to sensible lengths...
+Default is 15000 chars!
+
+Add a new account "wizard" setup which takes:
+Googlemail Address & Password
+
+and sets up the account for you as follows:
+Profile Name: Google
+Username    : lowercase email address
+Server      : talk.google.com
+SSL enabled, Google account = true
+
+We could perhaps set this to run at startup if no other accounts exist, and allow the user to exit out to the main menu screen
+
+So something like:
+
+Start > if (noAccounts()) > "Would you like to setup a new account for GoogleTalk now?" > Yes > Into Wizard
+       --> else there are > Show normal menu homescreen or auto-connect                  > No > Drop to homescreen
