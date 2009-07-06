@@ -33,3 +33,8 @@ So something like:
 
 Start > if (noAccounts()) > "Would you like to setup a new account for GoogleTalk now?" > Yes > Into Wizard
        --> else there are > Show normal menu homescreen or auto-connect                  > No > Drop to homescreen
+       
+Use LocationAPI to update status on GoogleTalk?
+
+Sign-on notification sounds
+
