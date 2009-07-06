@@ -21,6 +21,9 @@ public class TextSplitter {
     }
     static char[] delims = {',', '.', '\n', ':', '-', '+', ';', '!', '?', ' '};
 
+    /*
+     * This method requires a unit test as it's throwing lots of ArrayIndexOutOfBoundsExceptions in the Nokia 6230i emulator
+     */
     public static Vector split(String str, Font font, int width) {
         Vector v = new Vector();
         int lastIndex = 0;
