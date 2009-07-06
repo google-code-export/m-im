@@ -164,22 +164,24 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
             AppStore.getSharedStatus().addToBusyList(status.getValue().toString());
             return;
         }
-        if (radio.getValue() < 2 + AppStore.getSharedStatus().getOnlineList().size()) {
-            AppStore.getSelectedProfile().setStatus(AppStore.getSharedStatus().getOnlineList().elementAt(radio.getValue() - 2).toString());
-            AppStore.getSelectedProfile().setStatusID(0);
-            return;
+        if (radio.getValue() > -1) {
+            if (radio.getValue() < 2 + AppStore.getSharedStatus().getOnlineList().size()) {
+                AppStore.getSelectedProfile().setStatus(AppStore.getSharedStatus().getOnlineList().elementAt(radio.getValue() - 2).toString());
+                AppStore.getSelectedProfile().setStatusID(0);
+                return;
+            }
+            if (radio.getValue() < 4 + AppStore.getSharedStatus().getOnlineList().size() +
+                    AppStore.getSharedStatus().getBusyList().size()) {
+                AppStore.getSelectedProfile().setStatus(AppStore.getSharedStatus().getBusyList().elementAt(radio.getValue() - 4 -
+                        AppStore.getSharedStatus().getOnlineList().size()).toString());
+                AppStore.getSelectedProfile().setStatusID(3);
+                return;
+            }
+            AppStore.getSelectedProfile().setStatus(AppStore.getSharedStatus().getAwayList().elementAt(radio.getValue() - 6 -
+                    AppStore.getSharedStatus().getOnlineList().size() -
+                    AppStore.getSharedStatus().getBusyList().size()).toString());
+            AppStore.getSelectedProfile().setStatusID(1);
         }
-        if (radio.getValue() < 4 + AppStore.getSharedStatus().getOnlineList().size() +
-                AppStore.getSharedStatus().getBusyList().size()) {
-            AppStore.getSelectedProfile().setStatus(AppStore.getSharedStatus().getBusyList().elementAt(radio.getValue() - 4 -
-                    AppStore.getSharedStatus().getOnlineList().size()).toString());
-            AppStore.getSelectedProfile().setStatusID(3);
-            return;
-        }
-        AppStore.getSelectedProfile().setStatus(AppStore.getSharedStatus().getAwayList().elementAt(radio.getValue() - 6 -
-                AppStore.getSharedStatus().getOnlineList().size() -
-                AppStore.getSharedStatus().getBusyList().size()).toString());
-        AppStore.getSelectedProfile().setStatusID(1);
     }
 
     public boolean leftCommandClick() {
