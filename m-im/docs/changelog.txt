@@ -1,7 +1,11 @@
-v1.3.0 - in progress.. 
-	I'm currently working on this one... I've merged in the changes I've made section-by-section
-	and tagged it at each stage, so it's not all checked in as one massive change list! 
+v1.4.0 - Added New Account Wizard to ease setting up your first GoogleTalk Account in m-im
 
+	News - m-im has been added to XMPP.org and Wikipedia's lists of mobile phone clients for Jabber/XMPP!
+
+v1.3.2 - Added translations to Chinese from Chunlin
+
+v1.3.1 - Update including better network error handling and internal code changes
+ 
 	I run my own IM servers, so I can do things such as kicking my phone off the server by forcibly closing the connection
 	As a result, I've discovered that the "Auto-Reconnect" options aren't working very gracefully
 	I have implemented some new logic for handling the automatic reconnection of the socket, which appears to be working
