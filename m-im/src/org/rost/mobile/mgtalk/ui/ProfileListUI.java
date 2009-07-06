@@ -18,6 +18,7 @@ import org.rost.mobile.guilib.core.ItemActionListener;
 import org.rost.mobile.mgtalk.AppStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.Profile;
+import org.rost.mobile.mgtalk.model.ProfileList;
 
 /**
  *
@@ -103,12 +104,20 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
         //RefreshList
         clear();
         setCaption(i18n.getMessage("title_profiles"));
-        AppStore.getProfileList().refreshList();
-        for (int i = 0; i < AppStore.getProfileList().getProfilesCount(); i++) {
-            OneLineItem item = new OneLineItem();
-            item.setText(AppStore.getProfileList().getProfileAt(i).getName());
-            item.setItemActionListener(this);
-            addItem(item);
+        ProfileList list = AppStore.getProfileList();
+        list.refreshList();
+        int count = list.getProfilesCount();
+        if (count == 0 && AppStore.showWizard) {
+        	// We have no profiles, wizard time!
+            GUIStore.getManager().push(new NewAccountWizardLaunchUI());
+            GUIStore.getManager().notifyChanged();
+        } else {
+	        for (int i = 0; i < count; i++) {
+	            OneLineItem item = new OneLineItem();
+	            item.setText(list.getProfileAt(i).getName());
+	            item.setItemActionListener(this);
+	            addItem(item);
+	        }
         }
     }
 /*

@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
+import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.mgtalk.AppStore;
 
 /**
@@ -22,28 +23,28 @@ import org.rost.mobile.mgtalk.AppStore;
 public class Profile {
 
     /** Creates a new instance of Profile */
-    protected String userName = "@gmail.com";//
+    protected String userName = Constants.DEFAULT_USERNAME;
     protected String displayName = "";
-    protected String password = "";//
-    protected String host = "talk.google.com";//
-    protected String port = "5222";//
-    protected String resource = "Mobile"; // set to the mobile device name if available (see constructor)
-    protected String status = "I am here";//
+    protected String password = "";
+    protected String host = Constants.DEFAULT_HOST;
+    protected String port = Constants.DEFAULT_NONSSL_PORT;
+    protected boolean SSL = false;
+    protected String resource = Constants.DEFAULT_RESOURCE; // set to the mobile device name if available (see constructor)
+    protected String status = Constants.DEFAULT_STATUS_MSG;
     protected boolean statusActive = false;
-    protected String name = "Google talk";
-    protected boolean autoConnect = false;//
+    protected String name = Constants.DEFAULT_PROFILE_NAME;
+    protected boolean autoConnect = false;
     protected boolean autoReconnect = true;
-    protected boolean keepalive = true;
-    protected boolean xmppPing = true;
+    protected boolean keepalive = Constants.DEFAULT_KEEPALIVE;
+    protected boolean xmppPing = Constants.DEFAULT_XMPP_PING;
     protected boolean google = true;
-    protected boolean SSL = false;//
-    protected boolean sortByName = false;//
+    protected boolean sortByName = false;
     protected boolean moveChattersTop = true;
-    protected int statusID = 0;//
-    protected int volume = 9;
+    protected int statusID = Constants.DEFAULT_STATUS_ID;//
+    protected int volume = Constants.DEFAULT_VOLUME;
     protected boolean vibrate = true;
-    protected int vibrateTime = 8; //default 800ms
-    protected int historyLength = 20;
+    protected int vibrateTime = Constants.DEFAULT_VIBR_TIME;
+    protected int historyLength = Constants.DEFAULT_HISTORY_LEN;
     protected boolean smiles = false;
     protected boolean showOffline = false;
     protected String fullJID = "";

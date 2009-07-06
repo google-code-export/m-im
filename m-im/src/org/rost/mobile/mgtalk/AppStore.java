@@ -75,6 +75,8 @@ public class AppStore {
     public static final boolean S60;
     public static final boolean S40;
     
+    public static boolean showWizard = true;
+    
     static {
     	// This is about the best detection routine I've found so far..
     	boolean isS60 = false;
