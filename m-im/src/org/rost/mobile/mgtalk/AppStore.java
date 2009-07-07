@@ -230,18 +230,21 @@ public class AppStore {
     }
 
     public static void notifyMessage() {
-    	if (globalPrefs.isSoundEnabled()) {
-    		playMessage();
-    	}
     	if (globalPrefs.isVibrate() && getSelectedProfile().isVibrate()) {
     		vibrate();
+    	}
+    	if (globalPrefs.isSoundEnabled()) {
+    		// play a sound first, if that fails, beep!
+    		if (!playMessage()) {
+    			legacyBeep();
+    		}
     	}
     }
     
     /**
      * This routine plays message
      */
-    public static void playMessage() {
+    public static boolean playMessage() {
         try {
             if (PLAYER == null) {
                 //p = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "ring.mid"), "audio/midi");
@@ -267,14 +270,20 @@ public class AppStore {
                     }
                 }
                 PLAYER.start();
+                return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public static void legacyBeep() {
-    	AlertType.ERROR.playSound(GUIStore.getDisplay()); 
+    	try {
+    		AlertType.ERROR.playSound(GUIStore.getDisplay());
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
     public static void close() {

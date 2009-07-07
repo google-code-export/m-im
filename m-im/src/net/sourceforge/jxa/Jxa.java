@@ -56,6 +56,7 @@ public class Jxa extends Thread {
     private String googleToken = "";
 
     private boolean connected = false;
+    private int retryCount = 0;
     
     public boolean isConnected() {
 		return connected;
@@ -170,10 +171,19 @@ public class Jxa extends Thread {
 				hasBeenDisconnected = false; //reset this
                 //reconnect when connection is lost.
                 //TODO How many times should we retry.
+				
+				if (retryCount >= 2) {
+					break;
+				}
+				
                 try {
                     connect();
                 } catch (Exception e) {
                     hasBeenDisconnected = true;
+                    retryCount++;
+                	if (Constants.LOGGING) {
+                		Log.error("Error connecting", e);
+                	}
                     continue;
                 }
     		} else {
@@ -181,6 +191,10 @@ public class Jxa extends Thread {
                 try {
                     connect();
                 } catch (Exception e) {
+                    retryCount++;
+                	if (Constants.LOGGING) {
+                		Log.error("Error connecting", e);
+                	}
                     break;
                 }
             }
@@ -199,6 +213,11 @@ public class Jxa extends Thread {
         		Log.debug("login " + (loginOK ? "ok" : "failed!"));
         	}
 
+        	// Not sure if this is the correct logic, but if the login fails, we probably shouldn't continue?!
+        	if (!loginOK) {
+        		break;
+        	}
+        	
             try {
         		if (activeProfile.isKeepalive() && activeProfile.isXmppPing()) {
         			AppStore.startPinger();
