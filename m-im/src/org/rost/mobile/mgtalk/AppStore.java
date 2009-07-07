@@ -36,6 +36,7 @@ import org.rost.mobile.mgtalk.ui.SharedStatusUI;
 
 import com.google.code.mim.Log;
 import com.google.code.mim.XmppPinger;
+import javax.microedition.media.MediaException;
 
 /**
  *
@@ -244,7 +245,11 @@ public class AppStore {
         try {
             if (PLAYER == null) {
                 //p = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "ring.mid"), "audio/midi");
-            	PLAYER = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "pidgin-receive.amr"), "audio/amr");
+            	try {
+                    PLAYER = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "pidgin-receive.amr"), "audio/amr");
+                } catch (MediaException e) {
+                    PLAYER = Manager.createPlayer(new Object().getClass().getResourceAsStream(IMAGE_PREFIX + "ring.mid"), "audio/midi");
+                }
             }
             if (PLAYER.getState() != Player.STARTED) {
             	PLAYER.realize();
