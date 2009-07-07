@@ -41,7 +41,6 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
 
     public ChatUI() {
         textBox = new TextBoxItem(false); // This could be parameterised so that it's a choice whether to show status line or not!
-        //textBox.getCaption().addText("Type message here:", true, -1);
         setLeftCommand(i18n.getMessage("button_send"));
         setRightCommand(i18n.getMessage("button_list"));
         history = new UnselectableList();
@@ -63,7 +62,6 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     }
 
     public boolean leftCommandClick() {
-        //System.out.println("Send here");
         if (textBox.getValue().equals("")) {
             return true;
         }
@@ -116,7 +114,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     public void refreshView() {
         user.addUserListener(this);
         user.addMessageListener(this);
-        setCaption("Chat with " + user.getUserName());
+        setCaption(i18n.getMessage("title_chatui_chatwith") + " " + user.getUserName());
         //Fill history
         user.setUnreadMessages(0);
         history.clear();

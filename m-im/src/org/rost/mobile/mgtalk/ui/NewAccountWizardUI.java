@@ -18,7 +18,7 @@ public class NewAccountWizardUI extends SelectableList {
     CheckBoxItem security, connectAtStartup, showOfflineContacts;
 
     public NewAccountWizardUI() {
-		setCaption(i18n.getMessage("caption_wizard"));
+		setCaption(i18n.getMessage("title_wizard"));
 
     	setLeftCommand(i18n.getMessage("save"));
     	setRightCommand(i18n.getMessage("close"));

@@ -120,15 +120,6 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
 	        }
         }
     }
-/*
-    public boolean rightCommandClick() {
-        if (AppStore.getJxa() != null) {
-            AppStore.getJxa().close();
-        }
-        BaseMidlet.closeMIDLet();
-        return true;
-    }
-*/
   
     public void quitMIM() {
         if (AppStore.getJxa() != null) {
@@ -160,6 +151,6 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
         AppStore.getJxa().start();
 
         GUIStore.getManager().push(AppStore.getContactListUI());
-
     }
+    
 }

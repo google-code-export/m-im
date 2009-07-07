@@ -11,7 +11,7 @@ import org.rost.mobile.mgtalk.model.Profile;
 public class NewAccountWizardLaunchUI extends SelectableList {
 
 	public NewAccountWizardLaunchUI() {
-		setCaption(i18n.getMessage("caption_welcome_wizard"));
+		setCaption(i18n.getMessage("title_welcome_wizard"));
 		
         setLeftCommand(i18n.getMessage("choice_yes"));
         setRightCommand(i18n.getMessage("choice_no"));

@@ -34,7 +34,7 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
         status = new TextBoxItem("Set custom status here:");
         setLeftCommand(i18n.getMessage("button_set"));
         setRightCommand(i18n.getMessage("button_close"));
-        setCaption(i18n.getMessage("caption_status"));
+        setCaption(i18n.getMessage("title_status"));
     }
     String setCustom = i18n.getMessage("set_custom");
     String strDefault = i18n.getMessage("default");
@@ -67,7 +67,7 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
         }
         ReadOnlyTextItem online = new ReadOnlyTextItem();
         online.addImage(AppStore.STATUS_ONLINE);
-        online.addText("Available");
+        online.addText(i18n.getMessage("status_text_available"));
         addItem(online);
 
         if (AppStore.getSelectedProfile().isGoogle()) {
@@ -81,7 +81,7 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
 
         ReadOnlyTextItem busy = new ReadOnlyTextItem();
         busy.addImage(AppStore.STATUS_BUSY);
-        busy.addText("Busy");
+        busy.addText(i18n.getMessage("status_text_busy"));
         addItem(busy);
 
         if (AppStore.getSelectedProfile().isGoogle()) {
@@ -96,7 +96,7 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
 
         ReadOnlyTextItem away = new ReadOnlyTextItem();
         away.addImage(AppStore.STATUS_AWAY);
-        away.addText("Idle");
+        away.addText(i18n.getMessage("status_text_idle"));
         addItem(away);
 
         if (AppStore.getSelectedProfile().isGoogle()) {

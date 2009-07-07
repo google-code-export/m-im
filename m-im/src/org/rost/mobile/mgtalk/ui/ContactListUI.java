@@ -238,7 +238,7 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
 
     public void connectionTerminated(String msg) {
         if (msg == null){
-            msg = "Disconnected";
+            msg = i18n.getMessage("disconnected");
         }
         AppStore.getContactList().makeAllUsersOffline();
         AppStore.getInfoTicker().setMessage(msg, true);
