@@ -168,8 +168,23 @@ public class Jxa extends Thread {
     				break; // break out of this loop if we're not supposed to auto-reconnect!
     			}
 				hasBeenDisconnected = false; //reset this
-    		}
-        	connect();
+                //reconnect when connection is lost.
+                //TODO How many times should we retry.
+                try {
+                    connect();
+                } catch (Exception e) {
+                    hasBeenDisconnected = true;
+                    continue;
+                }
+    		} else {
+                //The first connect.
+                try {
+                    connect();
+                } catch (Exception e) {
+                    break;
+                }
+            }
+        	
         	try {
         		if (Constants.LOGGING) {
         			Log.debug("logging in..");
@@ -184,7 +199,7 @@ public class Jxa extends Thread {
         		Log.debug("login " + (loginOK ? "ok" : "failed!"));
         	}
 
-        try {
+            try {
         		if (activeProfile.isKeepalive() && activeProfile.isXmppPing()) {
         			AppStore.startPinger();
         		}
@@ -212,13 +227,13 @@ public class Jxa extends Thread {
                 e.printStackTrace();
             } finally {
             	if (activeProfile.isXmppPing()) {
-            		AppStore.stopPinger();
+                    AppStore.stopPinger();
             	}
             }    		
     	}
     }
 
-    private void connect() {
+    private void connect() throws Exception {
         try {
             if (!use_ssl) {
                 connection = (SocketConnection) Connector.open("socket://" + this.server + ":" + this.port, Connector.READ_WRITE);
@@ -244,11 +259,13 @@ public class Jxa extends Thread {
         		Log.error("CertificateException", ex);
         	}
             this.connectionFailed(ex.getReason() + ex.getMessage());
+            throw ex;
         } catch (final Exception e) {
         	if (Constants.LOGGING) {
         		Log.error("Connection Failed", e);
         	}
             this.connectionFailed(e.getMessage());
+            throw e;
         }
     }
 
