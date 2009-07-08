@@ -34,7 +34,9 @@ public class NewAccountWizardUI extends SelectableList {
         addItem(password);
 
         security = new CheckBoxItem(i18n.getMessage("profile_wizard_security"));
-        security.setSelected(true);
+        if (AppStore.isS60()) {
+        	security.setSelected(true);
+        }
         addItem(security);
 
         connectAtStartup = new CheckBoxItem(i18n.getMessage("profile_wizard_autoconnect"));
