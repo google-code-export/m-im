@@ -1,13 +1,20 @@
 package org.rost.mobile.mgtalk.ui;
 
+import javax.microedition.io.Connector;
+import javax.microedition.io.SocketConnection;
+import javax.microedition.pki.CertificateException;
+
 import org.rost.mobile.guilib.components.CheckBoxItem;
 import org.rost.mobile.guilib.components.PasswordItem;
 import org.rost.mobile.guilib.components.TextBoxItem;
 import org.rost.mobile.guilib.components.layers.SelectableList;
+import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.guilib.core.GUIStore;
 import org.rost.mobile.mgtalk.AppStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.Profile;
+
+import com.google.code.mim.Log;
 
 public class NewAccountWizardUI extends SelectableList {
 
@@ -40,7 +47,7 @@ public class NewAccountWizardUI extends SelectableList {
         addItem(advancedOptions);
         
         security = new CheckBoxItem(i18n.getMessage("profile_wizard_security"));
-        if (AppStore.isS60()) {
+        if (AppStore.isS60() || canUseSSL()) {
         	security.setSelected(true);
         }
         
@@ -135,6 +142,30 @@ public class NewAccountWizardUI extends SelectableList {
     		validEntries = false;
     	}
     	return validEntries;
+    }
+ 
+    private boolean canUseSSL() {
+    	if (Constants.LOGGING) {
+    		Log.info("Checking SSL connection...");
+    	}
+    	SocketConnection connection = null;
+		try {
+			connection = (SocketConnection) Connector.open("ssl://talk.google.com:5223", Connector.READ_WRITE);
+        } catch (final CertificateException ex) {
+        	if (Constants.LOGGING) {
+        		Log.error("Cannot use SSL, disabling it", ex);
+        	}
+        	return false;
+		} catch (Exception e) {
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception e) {
+			}
+		}
+		return true;
     }
     
 }
