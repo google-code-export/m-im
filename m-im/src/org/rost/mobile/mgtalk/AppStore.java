@@ -298,8 +298,12 @@ public class AppStore {
     }
     
     public static void vibrate() {
-    	//GUIStore.getDisplay().vibrate(800);
     	GUIStore.getDisplay().vibrate(AppStore.getSelectedProfile().getVibrateTime() * 100);
+    }
+
+    public static void errorBuzz() {
+    	GUIStore.getDisplay().vibrate(750);
+    	legacyBeep();
     }
     
     public static SharedStatusUI getSharedStatusUI() {
