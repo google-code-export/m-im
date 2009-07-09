@@ -44,7 +44,7 @@ public class TextSplitter {
                     }
                     String slice = str.substring(lastIndex, k);
                     lastIndex = k;
-                    i = k;
+                    i = k - 1;
                     if (font.stringWidth(slice) > width) {
                         while (font.stringWidth(slice) > width) {
                             k = 0;
