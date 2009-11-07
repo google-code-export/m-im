@@ -4,14 +4,14 @@
  */
 package com.google.code.mim;
 
-import com.google.code.mim.XmppListener;
+import com.google.code.mim.XMPPListener;
 import java.util.Vector;
 
 /**
  *
  * @author yaochunlin
  */
-public class XmppAdapter implements XmppListener {
+public class XmppAdapter implements XMPPListener {
 
     public void onConnFailed(String msg) {
     }

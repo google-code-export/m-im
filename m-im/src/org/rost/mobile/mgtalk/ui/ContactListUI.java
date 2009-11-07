@@ -11,7 +11,7 @@ package org.rost.mobile.mgtalk.ui;
 import java.util.Vector;
 import javax.microedition.lcdui.Image;
 import com.google.code.mim.XmppAdapter;
-import com.google.code.mim.XmppListener;
+import com.google.code.mim.XMPPListener;
 import org.rost.mobile.guilib.components.MenuItem;
 import org.rost.mobile.guilib.components.layers.Menu;
 import org.rost.mobile.guilib.components.layers.SelectableList;
@@ -35,19 +35,19 @@ import com.google.code.mim.Utils;
  *
  * @author Kostya
  */
-public class ContactListUI extends SelectableList implements UserAddedListener, UserDeletedListener, XmppListener, ItemActionListener {
+public class ContactListUI extends SelectableList implements UserAddedListener, UserDeletedListener, XMPPListener, ItemActionListener {
 
     /** Creates a new instance of ContactListUI */
     Menu menu = null;
     
-    XmppListener newMessagesListener = new XmppAdapter() {
+    XMPPListener newMessagesListener = new XmppAdapter() {
 
         public void onMessageEvent(String from, String body) {
             AppStore.getContactList().processNewMessage(from, body);
         }
 
     };
-    XmppListener contactListListener = new XmppAdapter() {
+    XMPPListener contactListListener = new XmppAdapter() {
 
         public void onStatusEvent(String jid, String show, String status) {
             AppStore.getContactList().processUserStateChange("", jid, status, Utils.statusStringToNumber(show));

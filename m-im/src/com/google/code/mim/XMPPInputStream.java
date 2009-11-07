@@ -162,7 +162,7 @@ public class XMPPInputStream {
                                 }
                                 if (subscription != null && (subscription.equals("both") || subscription.equals("to"))) {
                                     for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                                        XmppListener xl = (XmppListener) e.nextElement();
+                                        XMPPListener xl = (XMPPListener) e.nextElement();
                                         xl.onContactEvent(jid, name, "", subscription);
                                     }
                                 }
@@ -178,7 +178,7 @@ public class XMPPInputStream {
                         }
                         //SendVersion
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                            XmppListener xl = (XmppListener) e.nextElement();
+                            XMPPListener xl = (XMPPListener) e.nextElement();
                             xl.onVersion();
                         }
                     } else if (xmlns.equals(XMPP.GOOGLE_SHARED_STATUS)) {
@@ -213,7 +213,7 @@ public class XMPPInputStream {
 
                         //System.out.println(this.reader.getName() + this.reader.getType());
                         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                            XmppListener xl = (XmppListener) e.nextElement();
+                            XMPPListener xl = (XMPPListener) e.nextElement();
                             xl.onSharedStatusEvent(status, show, awayList, busyList, onlineList);
                         }
 
@@ -236,7 +236,7 @@ public class XMPPInputStream {
         int i = rsp_jid.indexOf('/');
         String resource = rsp_jid.substring(i++);
         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-            XmppListener xl = (XmppListener) e.nextElement();
+            XMPPListener xl = (XMPPListener) e.nextElement();
             xl.onBind(rsp_jid);
         }
     }
@@ -274,24 +274,24 @@ public class XMPPInputStream {
         //if ((type != null) && (type.equals("unavailable") || type.equals("unsubscribed") || type.equals("error"))) {
         if (type == null) {
             for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                XmppListener xl = (XmppListener) e.nextElement();
+                XMPPListener xl = (XMPPListener) e.nextElement();
                 xl.onStatusEvent(from, show, status);
             }
         } else {
             if (type.equals(XMPP.UNSUBSCRIBED)) {
                 for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                    XmppListener xl = (XmppListener) e.nextElement();
+                    XMPPListener xl = (XMPPListener) e.nextElement();
                     xl.onUnsubscribeEvent(from);
                 }
             } else if (type.equals(XMPP.SUBSCRIBE)) {
                 for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                    XmppListener xl = (XmppListener) e.nextElement();
+                    XMPPListener xl = (XMPPListener) e.nextElement();
                     xl.onSubscribeEvent(from);
                 }
             } else if (type.equals(XMPP.UNAVAILABLE)) {
                 //final String jid = (from.indexOf('/') == -1) ? from : from.substring(0, from.indexOf('/'));
                 for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-                    XmppListener xl = (XmppListener) e.nextElement();
+                    XMPPListener xl = (XMPPListener) e.nextElement();
                     //xl.onStatusEvent(jid, show, status);
                     xl.onStatusEvent(from, XMPP.NA, status);
                 }
@@ -316,12 +316,12 @@ public class XMPPInputStream {
         }
         //TODO  (from, subject, body);
         for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-            XmppListener xl = (XmppListener) e.nextElement();
+            XMPPListener xl = (XMPPListener) e.nextElement();
             xl.onMessageEvent((from.indexOf('/') == -1) ? from : from.substring(0, from.indexOf('/')), body);
         }
     }
 
-    void addListener(XmppListener listener) {
+    void addListener(XMPPListener listener) {
         listeners.addElement(listener);
     }
 }

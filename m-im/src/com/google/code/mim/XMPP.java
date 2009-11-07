@@ -341,7 +341,7 @@ public class XMPP extends XmppAdapter{
         writer.setStatus(show, status, priority);
     }
 
-    public void addListener(XmppListener listener) {
+    public void addListener(XMPPListener listener) {
         this.reader.addListener(listener);
     }
 
