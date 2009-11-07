@@ -41,7 +41,7 @@ import java.util.Vector;
  * Time: 13:45:44
  * To change this template use File | Settings | File Templates.
  */
-public class XMPPOutputStream {
+public class XMPPOutputStream extends XmppAdapter{
     private String domain;
     private int iq_id = 0;
     private String jid;
@@ -58,17 +58,19 @@ public class XMPPOutputStream {
     private KXmlSerializer writer;
 
 
-    public void startStream() throws IOException {
-        writer.startDocument(XMPP.UTF_8, null);
-        writer.setPrefix(XMPP.STREAM, XMPP.HTTP_ETHERX_JABBER_ORG_STREAMS);
-        writer.startTag(XMPP.HTTP_ETHERX_JABBER_ORG_STREAMS, XMPP.STREAM);
+    public synchronized void startStream() throws IOException {
+        //writer.startDocument(XMPP.UTF_8, null);
+        //writer.setPrefix(XMPP.STREAM, XMPP.HTTP_ETHERX_JABBER_ORG_STREAMS);
+        writer.startTag(null, XMPP.STREAM_STREAM);
         writer.attribute(null, XMPP.XMLNS, XMPP.JABBER_CLIENT);
         writer.attribute(null, XMPP.TO, domain);
         writer.attribute(null, XMPP.VERSION, XMPP.V_10);
+        writer.attribute(null,XMPP.XMLNSSTREAM, XMPP.HTTP_ETHERX_JABBER_ORG_STREAMS);
+        writer.text("\n");
         writer.flush();
     }
 
-    public void writeSASL(String mechanism, String token) throws IOException {
+    public synchronized void writeSASL(String mechanism, String token) throws IOException {
         writer.startTag(null, XMPP.AUTH);
         writer.attribute(null, XMPP.XMLNS, XMPP.URN_IETF_PARAMS_XML_NS_XMPP_SASL);
         if (mechanism != null) {
@@ -81,7 +83,7 @@ public class XMPPOutputStream {
         writer.flush();
     }
 
-    public int writeBind(String resource) throws IOException {
+    public synchronized int writeBind(String resource) throws IOException {
         //"<iq type='set' id='res_binding'><bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" + resource + "</resource></bind></iq>";
         iq_id++;
         writer.startTag(null, XMPP.IQ);
@@ -105,12 +107,12 @@ public class XMPPOutputStream {
         return String.valueOf(iq_id++);
     }
 
-    public int writeVersion() throws IOException {
+    public synchronized int writeVersion() throws IOException {
         // send version
         this.writer.startTag(null, "iq");
         this.writer.attribute(null, "type", "result");
         this.writer.attribute(null, "id", getIqId());
-        this.writer.attribute(null, "to", this.jid);   //TODO recive bind message.
+        this.writer.attribute(null, "to", this.jid);
         this.writer.startTag(null, "query");
         this.writer.attribute(null, "xmlns", "jabber:iq:version");
 
@@ -255,17 +257,7 @@ public class XMPPOutputStream {
         }
     }
 
-    public static String statusIDtoString(int statusID) {
-        switch (statusID) {
-            case 1:
-                return "away";
-            case 2:
-                return "xa";
-            case 3:
-                return "dnd";
-        }
-        return "";
-    }
+
 
     /**
      * Sends a message text to a known jid.
@@ -441,6 +433,18 @@ public class XMPPOutputStream {
         this.writer.endTag(null,XMPP.QUERY); // query
         this.writer.endTag(null, XMPP.IQ); // iq
         this.writer.flush();
+    }
+
+    public void onBind(String jid) {
+        this.jid = jid;
+    }
+
+    public void onVersion() {
+        try {
+            this.writeVersion();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

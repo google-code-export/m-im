@@ -8,12 +8,10 @@
  */
 package org.rost.mobile.mgtalk.ui;
 
-import java.io.IOException;
 import java.util.Vector;
 import javax.microedition.lcdui.Image;
-import net.sourceforge.jxa.Jxa;
-import net.sourceforge.jxa.XmppAdapter;
-import net.sourceforge.jxa.XmppListener;
+import com.google.code.mim.XmppAdapter;
+import com.google.code.mim.XmppListener;
 import org.rost.mobile.guilib.components.MenuItem;
 import org.rost.mobile.guilib.components.layers.Menu;
 import org.rost.mobile.guilib.components.layers.SelectableList;
@@ -31,6 +29,7 @@ import org.rost.mobile.mgtalk.model.UserDeletedListener;
 import org.rost.mobile.mgtalk.model.UserList;
 
 import com.google.code.mim.Log;
+import com.google.code.mim.Utils;
 
 /**
  *
@@ -51,7 +50,7 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
     XmppListener contactListListener = new XmppAdapter() {
 
         public void onStatusEvent(String jid, String show, String status) {
-            AppStore.getContactList().processUserStateChange("", jid, status, Jxa.statusStringToNumber(show));
+            AppStore.getContactList().processUserStateChange("", jid, status, Utils.statusStringToNumber(show));
         }
 
         public void onContactEvent(String jid, String name, String group, String subscription) {
@@ -133,9 +132,9 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
         dissItem.setItemActionListener(new ItemActionListener() {
 
             public void actionPerformed() {
-                //AppStore.getJxa().logoff();
-                AppStore.getJxa().close();
-                AppStore.setJxa(null);
+                //AppStore.getXMPP().logoff();
+                AppStore.getXMPP().close();
+                AppStore.setXMPP(null);
                 GUIStore.getManager().push(AppStore.getProfileListUI());
             }
         });
@@ -145,9 +144,8 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
         quitItem.setItemActionListener(new ItemActionListener() {
 
             public void actionPerformed() {
-                AppStore.getJxa().logoff();
-                AppStore.getJxa().close();
-                AppStore.setJxa(null);
+                AppStore.getXMPP().close();
+                AppStore.setXMPP(null);
                 BaseMidlet.closeMIDLet();
             }
         });
@@ -176,9 +174,9 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
 
     public boolean rightCommandClick() {
 //        clear();
-        //AppStore.getJxa().logoff();
-        //AppStore.getJxa().close();
-        //AppStore.setJxa(null);
+        //AppStore.getXMPP().logoff();
+        //AppStore.getXMPP().close();
+        //AppStore.setXMPP(null);
         //GUIStore.getManager().push(AppStore.getProfileListUI());
         //return true;
     	
@@ -198,12 +196,12 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
     }
 
     public void init() {
-        AppStore.getJxa().addListener(contactListListener);
-        AppStore.getJxa().addListener(newMessagesListener);
-        AppStore.getJxa().addListener(AppStore.getSharedStatus());
+        AppStore.getXMPP().addListener(contactListListener);
+        AppStore.getXMPP().addListener(newMessagesListener);
+        AppStore.getXMPP().addListener(AppStore.getSharedStatus());
         AppStore.getContactList().addUserAddedListener(this);
         AppStore.getContactList().addUserDeletedListener(this);
-        AppStore.getJxa().addListener(this);
+        AppStore.getXMPP().addListener(this);
 
     }
 
@@ -257,19 +255,8 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
         connectionTerminated(msg);
     }
 
-    public void onAuth(String responseJid) {
-        try {
-            profile().setFullJID(responseJid);
-            AppStore.getJxa().startSession();
-            if(profile().isGoogle()){
-                AppStore.getJxa().sendGoogleSettings();
-            }else{
-                AppStore.getJxa().setStatus(Jxa.statusIDtoString(profile().getStatusID()), profile().getStatus(), 0);
-            }
-            AppStore.getJxa().getRoster();
-        } catch (IOException ex) {
-            connectionTerminated(ex.getMessage());
-        }
+    public void onBind(String responseJid) {
+        profile().setFullJID(responseJid);
     }
 
     public void onAuthFailed(String message) {
@@ -294,6 +281,9 @@ public class ContactListUI extends SelectableList implements UserAddedListener, 
     }
 
     public void onSharedStatusEvent(String status, int show, Vector awayList, Vector busyList, Vector onlineList) {
+    }
+
+    public void onVersion() {
     }
     
 }

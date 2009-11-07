@@ -8,14 +8,13 @@
  */
 package org.rost.mobile.mgtalk;
 
+import java.io.IOException;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Image;
 import javax.microedition.media.Control;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.VolumeControl;
-
-import net.sourceforge.jxa.Jxa;
 
 import org.rost.mobile.guilib.core.Constants;
 import org.rost.mobile.guilib.core.GUIStore;
@@ -35,8 +34,10 @@ import org.rost.mobile.mgtalk.ui.ProfileUI;
 import org.rost.mobile.mgtalk.ui.SharedStatusUI;
 
 import com.google.code.mim.Log;
+import com.google.code.mim.XMPP;
 import com.google.code.mim.XmppPinger;
 import javax.microedition.media.MediaException;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  *
@@ -52,7 +53,7 @@ public class AppStore {
     protected static ErrorMessage errorMessage = null;
     static Profile selectedProfile = null;
     //protected static NetworkDispatcher networkDispatcher = null;
-    protected static Jxa jxa = null;
+    protected static XMPP xmpp = null;
     static InfoTicker infoTicker = null;
     protected static ContactListUI contactListUI = null;
     static UserList contactList = null;
@@ -181,8 +182,8 @@ public class AppStore {
         return selectedProfile;
     }
 
-    public static void setJxa(Jxa jxa) {
-        AppStore.jxa = jxa;
+    public static void setXMPP(XMPP xmpp) {
+        AppStore.xmpp = xmpp;
     }
 
     public static void setSelectedProfile(Profile aSelectedProfile) {
@@ -193,8 +194,8 @@ public class AppStore {
         selectedProfile = aSelectedProfile;
     }
 
-    public static Jxa getJxa() {
-        return jxa;
+    public static XMPP getXMPP() {
+        return xmpp;
     }
 
     public static InfoTicker getInfoTicker() {
@@ -310,15 +311,15 @@ public class AppStore {
         return sharedStatusUI;
     }
 
-    public static void initJxa() {
-        if (jxa != null) {
-            jxa.close();
+    public static void initXMPP() throws IOException, XmlPullParserException {
+        if (xmpp != null) {
+            xmpp.close();
         }
         final Profile profile = getSelectedProfile();
         if (Constants.LOGGING) {
-        	Log.info("initialising Jxa...");
+        	Log.info("initialising XMPP...");
         }
-        jxa = new Jxa(profile.getFullJID(), profile.getPassword(), profile.getResource(), 10, profile.getHost(), profile.getPort(), profile.isSSL());
+        xmpp = new XMPP(profile);
     }
     
     public static boolean isS60() {

@@ -8,6 +8,7 @@
  */
 package org.rost.mobile.mgtalk.ui;
 
+import java.io.IOException;
 import javax.microedition.lcdui.Graphics;
 import org.rost.mobile.guilib.components.StaticRichText;
 import org.rost.mobile.guilib.components.TextBoxItem;
@@ -62,24 +63,22 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     }
 
     public boolean leftCommandClick() {
+
         if (textBox.getValue().equals("")) {
             return true;
         }
-        /*
-        System.out.println("Sending: "+"<message to=\""+
-        user.getCurrentSession()+"\" from=\"${fullJID}\" type=\"chat\">"+
-        (AppStore.getSelectedProfile().isGoogle()?"<nos:x value=\"disabled\" xmlns:nos=\"google:nosave\"/>":"")+
-        "<body>"+NetworkTools.toXML(textBox.getValue().toString())+"</body></message>");
-        AppStore.getNetworkDispatcher().sendMessage("<message to=\""+
-        user.getCurrentSession()+"\" from=\"${fullJID}\" type=\"chat\">"+
-        (AppStore.getSelectedProfile().isGoogle()?"<nos:x value=\"disabled\" xmlns:nos=\"google:nosave\"/>":"")+
-        "<body>"+NetworkTools.toXML(textBox.getValue().toString())+"</body></message>");
-         */
-        AppStore.getJxa().sendMessage(user.getCurrentSession(), textBox.getValue().toString());
-        user.addMessageToHistory(textBox.getValue().toString(), user.getCurrentSession(), false);
-        textBox.setValue("");
+        try {
+            AppStore.getXMPP().sendMessage(user.getCurrentSession(), textBox.getValue().toString());
+            user.addMessageToHistory(textBox.getValue().toString(), user.getCurrentSession(), false);
+            textBox.setValue("");
+        } catch (IOException ex) {
+            user.addMessageToHistory(ex.getMessage(), user.getCurrentSession(), false);
+        }
+
         notifyChanged();
+
         return true;
+
     }
 
     public boolean selectCommandClick() {
@@ -88,9 +87,9 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
     }
 
     public boolean processKeyPress(int keyCode) {
-    	if (Constants.LOGGING) {
-        	Log.debug("Keypress=" + keyCode);
-    	}
+        if (Constants.LOGGING) {
+            Log.debug("Keypress=" + keyCode);
+        }
         if (history.processKeyPress(keyCode)) {
             notifyChanged();
             return true;
@@ -144,7 +143,7 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
             AppStore.notifyMessage();
         }
         if (Constants.LOGGING) {
-        	Log.debug("New message!");
+            Log.debug("New message!");
         }
         history.pushItemFront(item);
         history.setCurrentPosition(0);

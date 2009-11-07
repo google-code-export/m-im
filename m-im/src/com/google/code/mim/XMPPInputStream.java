@@ -24,7 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.google.code.mim;
 
 import org.kxml2.io.KXmlParser;
@@ -46,7 +45,6 @@ import java.util.Vector;
 public class XMPPInputStream {
 
     private InputStream is;
-
     private KXmlParser reader;
     boolean supportTLS;
     boolean supportBind;
@@ -56,10 +54,13 @@ public class XMPPInputStream {
     boolean supportGoogleToken;
     public static final String GROUP = "group";
 
-    public XMPPInputStream(InputStream is) throws XmlPullParserException {
+    public XMPPInputStream() {
+    }
+
+    public void setInput(InputStream is) throws XmlPullParserException {
         this.is = is;
         this.reader = new KXmlParser();
-        this.reader.setInput(this.is, null /* auto detect?? "UTF-8"*/);
+        this.reader.setInput(this.is, "UTF-8" /* auto detect?? "UTF-8"*/);
     }
 
     public void startStream() throws IOException, XmlPullParserException {
@@ -80,7 +81,6 @@ public class XMPPInputStream {
                     if (tagName.equals(XMPP.MECHANISM)) {
                         String text = reader.nextText();
                         if (text == null) {
-
                         } else if (text.equals(XMPP.PLAIN)) {
                             supportPlain = true;
                         } else if (text.equals(XMPP.X_GOOGLE_TOKEN)) {
@@ -148,18 +148,24 @@ public class XMPPInputStream {
                             if (this.reader.getName().equals(XMPP.ITEM)) {
                                 String jid = reader.getAttributeValue(null, XMPP.JID);
                                 String name = reader.getAttributeValue(null, XMPP.NAME);
+                                name = name == null ? "" : name;
                                 String subscription = reader.getAttributeValue(null, XMPP.SUBSCRIPTION);
-                                boolean check = true;
+
                                 while (this.reader.nextTag() == XmlPullParser.START_TAG) {
                                     if (this.reader.getName().equals(GROUP)) {
                                         final String groupName = reader.nextText();
-                                        //TODO trigger listener
-                                        check = false;
+                                        //TODO Support group
+
                                     } else {
                                         reader.skipSubTree();
                                     }
                                 }
-                                //TODO subscription .equals null.
+                                if (subscription != null && (subscription.equals("both") || subscription.equals("to"))) {
+                                    for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
+                                        XmppListener xl = (XmppListener) e.nextElement();
+                                        xl.onContactEvent(jid, name, "", subscription);
+                                    }
+                                }
                             } else {
                                 reader.skipSubTree();
                             }
@@ -170,8 +176,11 @@ public class XMPPInputStream {
                         while (this.reader.nextTag() == XmlPullParser.START_TAG) {
                             this.reader.skipSubTree();
                         }
-                        // TODO trigger SendVersion
-
+                        //SendVersion
+                        for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
+                            XmppListener xl = (XmppListener) e.nextElement();
+                            xl.onVersion();
+                        }
                     } else if (xmlns.equals(XMPP.GOOGLE_SHARED_STATUS)) {
                         String status = null;
                         int show = 0;
@@ -182,7 +191,7 @@ public class XMPPInputStream {
                             if (this.reader.getName().equals(XMPP.STATUS)) {
                                 status = reader.nextText();
                             } else if (this.reader.getName().equals(XMPP.SHOW)) {
-                                show = statusStringToNumber(reader.nextText());
+                                show = Utils.statusStringToNumber(reader.nextText());
                             } else if (this.reader.getName().equals(XMPP.STATUS_LIST)) {
                                 if (this.reader.getAttributeValue(null, XMPP.SHOW).equals(XMPP.AWAY)) {
                                     while (this.reader.nextTag() == XmlPullParser.START_TAG) {
@@ -202,11 +211,11 @@ public class XMPPInputStream {
                             }
                         }
 
-                        //TODO listener System.out.println(this.reader.getName() + this.reader.getType());
-//                        for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-//                            XmppListener xl = (XmppListener) e.nextElement();
-//                            xl.onSharedStatusEvent(status, show, awayList, busyList, onlineList);
-//                        }
+                        //System.out.println(this.reader.getName() + this.reader.getType());
+                        for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
+                            XmppListener xl = (XmppListener) e.nextElement();
+                            xl.onSharedStatusEvent(status, show, awayList, busyList, onlineList);
+                        }
 
                     } else {
                         this.reader.skipSubTree();
@@ -226,32 +235,14 @@ public class XMPPInputStream {
         rsp_jid = reader.nextText();
         int i = rsp_jid.indexOf('/');
         String resource = rsp_jid.substring(i++);
-        //TODO triger listener
-    }
-
-    public static int statusStringToNumber(String str) {
-        if (str.equals(XMPP.AWAY)) {
-            return 1;
+        for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
+            XmppListener xl = (XmppListener) e.nextElement();
+            xl.onBind(rsp_jid);
         }
-        if (str.equals(XMPP.NA)) {
-            return 2;
-        }
-        if (str.equals("xa")) {
-            return 2;
-        }
-        if (str.equals("busy")) {
-            return 3;
-        }
-        if (str.equals(XMPP.DND)) {
-            return 3;
-        }
-        return 0;
     }
 
     public void parse() throws IOException, XmlPullParserException {
-        int i=0;
         while (reader.nextTag() == XmlPullParser.START_TAG) {
-            i++;
             final String tagName = this.reader.getName();
             if (tagName.equals(XMPP.MESSAGE)) {
                 this.parseMessage();
@@ -263,11 +254,11 @@ public class XMPPInputStream {
                 this.reader.skipSubTree();
             }
         }
-        System.out.println(i);
+        
     }
 
     private void parsePresence() throws IOException, XmlPullParserException {
-                final String from = this.reader.getAttributeValue(null,XMPP.FROM),  type = this.reader.getAttributeValue(null,XMPP.TYPE);
+        final String from = this.reader.getAttributeValue(null, XMPP.FROM), type = this.reader.getAttributeValue(null, XMPP.TYPE);
         String status = "", show = "";
         while (this.reader.nextTag() == XmlPullParser.START_TAG) {
             final String tmp = this.reader.getName();
@@ -310,7 +301,7 @@ public class XMPPInputStream {
     private Vector listeners = new Vector();
 
     private void parseMessage() throws IOException, XmlPullParserException {
-               final String from = this.reader.getAttributeValue(null,XMPP.FROM);
+        final String from = this.reader.getAttributeValue(null, XMPP.FROM);
         //final String type = this.reader.getAttribute("type");
         String body = null, subject = null;
         while (this.reader.nextTag() == XmlPullParser.START_TAG) {
@@ -328,6 +319,9 @@ public class XMPPInputStream {
             XmppListener xl = (XmppListener) e.nextElement();
             xl.onMessageEvent((from.indexOf('/') == -1) ? from : from.substring(0, from.indexOf('/')), body);
         }
-        System.out.println(from + ":"+body);
+    }
+
+    void addListener(XmppListener listener) {
+        listeners.addElement(listener);
     }
 }

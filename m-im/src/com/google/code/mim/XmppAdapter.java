@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.jxa;
+package com.google.code.mim;
 
+import com.google.code.mim.XmppListener;
 import java.util.Vector;
 
 /**
@@ -15,7 +16,7 @@ public class XmppAdapter implements XmppListener {
     public void onConnFailed(String msg) {
     }
 
-    public void onAuth(String resource) {
+    public void onBind(String resource) {
     }
 
     public void onAuthFailed(String message) {
@@ -40,5 +41,8 @@ public class XmppAdapter implements XmppListener {
     }
 
     public void onSharedStatusEvent(String status, int show, Vector awayList, Vector busyList, Vector onlineList) {
+    }
+
+    public void onVersion() {
     }
 }

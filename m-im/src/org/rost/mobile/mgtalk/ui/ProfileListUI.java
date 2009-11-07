@@ -8,6 +8,7 @@
  */
 package org.rost.mobile.mgtalk.ui;
 
+import java.io.IOException;
 import org.rost.mobile.guilib.components.MenuItem;
 import org.rost.mobile.guilib.components.OneLineItem;
 import org.rost.mobile.guilib.components.layers.Menu;
@@ -19,6 +20,7 @@ import org.rost.mobile.mgtalk.AppStore;
 import org.rost.mobile.mgtalk.i18n.i18n;
 import org.rost.mobile.mgtalk.model.Profile;
 import org.rost.mobile.mgtalk.model.ProfileList;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  *
@@ -28,6 +30,7 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
 
     /** Creates a new instance of ProfileListUI */
     Menu menu;
+    private Thread loader;
 
     public ProfileListUI() {
         menu = new Menu(0, i18n.getMessage("menu_select"), i18n.getMessage("menu_cancel"));
@@ -75,26 +78,28 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
             }
         });
         menu.addMenuItem(delItem);
-        
+
         MenuItem globalPrefsItem = new MenuItem(i18n.getMessage("globalprefs"));
         globalPrefsItem.setItemActionListener(new ItemActionListener() {
-        	public void actionPerformed() {
-        		GlobalPrefsUI ui = AppStore.getGlobalPrefsUI();
-        		ui.setBackToInterface(AppStore.getProfileListUI());
-        		GUIStore.getManager().push(ui);
-        		GUIStore.getManager().notifyChanged();
-        	}
+
+            public void actionPerformed() {
+                GlobalPrefsUI ui = AppStore.getGlobalPrefsUI();
+                ui.setBackToInterface(AppStore.getProfileListUI());
+                GUIStore.getManager().push(ui);
+                GUIStore.getManager().notifyChanged();
+            }
         });
         menu.addMenuItem(globalPrefsItem);
-        
+
         MenuItem quitItem = new MenuItem(i18n.getMessage("quit"));
         quitItem.setItemActionListener(new ItemActionListener() {
-        	public void actionPerformed() {
-        		quitMIM();
-        	}
+
+            public void actionPerformed() {
+                quitMIM();
+            }
         });
         menu.addMenuItem(quitItem);
-        
+
         setLeftCommand(i18n.getMessage("menu"));
         //setRightCommand(i18n.getMessage("quit"));
         setRightCommand(i18n.getMessage("globalprefs"));
@@ -108,30 +113,30 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
         list.refreshList();
         int count = list.getProfilesCount();
         if (count == 0 && AppStore.showWizard) {
-        	// We have no profiles, wizard time!
+            // We have no profiles, wizard time!
             GUIStore.getManager().push(new NewAccountWizardLaunchUI());
             GUIStore.getManager().notifyChanged();
         } else {
-	        for (int i = 0; i < count; i++) {
-	            OneLineItem item = new OneLineItem();
-	            item.setText(list.getProfileAt(i).getName());
-	            item.setItemActionListener(this);
-	            addItem(item);
-	        }
+            for (int i = 0; i < count; i++) {
+                OneLineItem item = new OneLineItem();
+                item.setText(list.getProfileAt(i).getName());
+                item.setItemActionListener(this);
+                addItem(item);
+            }
         }
     }
-  
+
     public void quitMIM() {
-        if (AppStore.getJxa() != null) {
-            AppStore.getJxa().close();
+        if (AppStore.getXMPP() != null) {
+            AppStore.getXMPP().close();
         }
         BaseMidlet.closeMIDLet();
     }
-    
+
     public boolean rightCommandClick() {
-		GUIStore.getManager().push(AppStore.getGlobalPrefsUI());
-		GUIStore.getManager().notifyChanged();
-		return true;
+        GUIStore.getManager().push(AppStore.getGlobalPrefsUI());
+        GUIStore.getManager().notifyChanged();
+        return true;
     }
 
     public boolean leftCommandClick() {
@@ -146,11 +151,26 @@ public class ProfileListUI extends SelectableList implements ItemActionListener 
 
     public void actionPerformed() {
         AppStore.setSelectedProfile(AppStore.getProfileList().getProfileAt(getSelectedIndex()));
-        AppStore.initJxa();
-        AppStore.getContactListUI().init();
-        AppStore.getJxa().start();
 
+        this.loader = new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    AppStore.initXMPP();
+
+                    AppStore.getContactListUI().init();
+
+                    AppStore.getXMPP().connect();
+                    AppStore.getXMPP().mainloop();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } catch (XmlPullParserException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        this.loader.start();
         GUIStore.getManager().push(AppStore.getContactListUI());
+
     }
-    
 }

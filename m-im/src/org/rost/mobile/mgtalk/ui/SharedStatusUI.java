@@ -8,6 +8,7 @@
  */
 package org.rost.mobile.mgtalk.ui;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import org.rost.mobile.guilib.components.CheckBoxItem;
@@ -188,7 +189,11 @@ public class SharedStatusUI extends SelectableList implements ItemActionListener
         //Select info from form
         if (AppStore.getSelectedProfile().isGoogle()) {
             modifyStatus();
-            AppStore.getSharedStatus().refreshPresenceStatus();
+            try {
+                AppStore.getSharedStatus().refreshPresenceStatus();
+            } catch (IOException ex) {
+                //ignore
+            }
         }
         rightCommandClick();
         return true;

@@ -8,9 +8,10 @@
  */
 package org.rost.mobile.mgtalk.model;
 
+import com.google.code.mim.Utils;
+import java.io.IOException;
 import java.util.Vector;
-import net.sourceforge.jxa.Jxa;
-import net.sourceforge.jxa.XmppAdapter;
+import com.google.code.mim.XmppAdapter;
 import org.rost.mobile.mgtalk.AppStore;
 
 /**
@@ -37,7 +38,11 @@ public class SharedStatus extends XmppAdapter {
             AppStore.getSelectedProfile().setStatusActive(true);
             
         }else{
-            refreshPresenceStatus();
+            try {
+                refreshPresenceStatus();
+            } catch (IOException ex) {
+                //ignore 
+            }
         }
         firstRefresh = false;
         this.awayList = awayList;
@@ -53,14 +58,16 @@ public class SharedStatus extends XmppAdapter {
         return s;
     }
 
-    public void sendStatusStanza() {
+    public void sendStatusStanza() throws IOException {
         //StringBuffer sb = new StringBuffer();
         if (AppStore.getSelectedProfile().isStatusActive()) {
             status = AppStore.getSelectedProfile().getStatus();
+        } else {
+            status = "";
         }
         String to = AppStore.getSelectedProfile().getUserName();
-        String show = Jxa.statusIDtoString(AppStore.getSelectedProfile().getStatusID());
-        AppStore.getJxa().sendShareStatus(to, status, show, onlineList, awayList, busyList);
+        String show = Utils.statusIDtoString(AppStore.getSelectedProfile().getStatusID());
+        AppStore.getXMPP().sendShareStatus(to, status, show, onlineList, awayList, busyList);
 
     }
 
@@ -98,7 +105,7 @@ public class SharedStatus extends XmppAdapter {
         }
     }
 
-    public void refreshPresenceStatus() {
+    public void refreshPresenceStatus() throws IOException {
         final Profile selectedProfile = AppStore.getSelectedProfile();
         if (selectedProfile.isGoogle()) {
             if (!AppStore.getSharedStatus().isFirstRefresh()) {
@@ -106,7 +113,8 @@ public class SharedStatus extends XmppAdapter {
                 sharedStatus.sendStatusStanza();
             }
         } else {
-            AppStore.getJxa().setStatus(Jxa.statusIDtoString(selectedProfile.getStatusID()), selectedProfile.isStatusActive() ? selectedProfile.getStatus() : null, 5);
+            
+                AppStore.getXMPP().setStatus(Utils.statusIDtoString(selectedProfile.getStatusID()), selectedProfile.isStatusActive() ? selectedProfile.getStatus() : null, 5);
         }
     }
 }
