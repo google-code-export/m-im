@@ -375,6 +375,12 @@ public class XMPP extends XmppAdapter{
         this.boundJID=true;
     }
 
+    public synchronized void sendPing(int id) throws IOException {
+        writer.sendPing(id);
+    }
+
+    
+
 
 }
 
