@@ -50,10 +50,10 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
 
     public void paintCustom(Graphics g) {
         contactInfo.paint(g, GUIMisc.getActiveX(), GUIMisc.getActiveY());
-        textBox.paintSelected(g, GUIMisc.getActiveX(), GUIMisc.getActiveY() + contactInfo.getHeight());
         history.setYCredentials(GUIMisc.getActiveHeight() - textBox.getHeight() - contactInfo.getHeight(),
-                GUIMisc.getActiveY() + textBox.getHeight() + contactInfo.getHeight());
+                GUIMisc.getActiveY() + contactInfo.getHeight());
         history.paint(g);
+        textBox.paintSelected(g, GUIMisc.getActiveX(), GUIMisc.getActiveHeight()- textBox.getHeight() + 10 );
     }
 
     public boolean rightCommandClick() {
@@ -118,8 +118,9 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
         user.setUnreadMessages(0);
         history.clear();
         for (int i = 0; i < user.getHistory().size(); i++) {
-            history.pushItemBack((ItemInterface) user.getHistory().elementAt(i));
+            history.pushItemFront((ItemInterface) user.getHistory().elementAt(i));
         }
+        history.setCurrentPosition(history.getCurrentHeight()-history.getHeight());
         contactInfo.setInfo(ContactListUI.statusIDToImage(user.getStatusID()), user.getUserName(), user.getStatus(), true);
     }
 
@@ -145,8 +146,8 @@ public class ChatUI extends LayerInterface implements UserStateListener, UserMes
         if (Constants.LOGGING) {
             Log.debug("New message!");
         }
-        history.pushItemFront(item);
-        history.setCurrentPosition(0);
+        history.pushItemBack(item);
+        history.setCurrentPosition(history.getCurrentHeight()-history.getHeight());
         notifyChanged();
         return true;
     }

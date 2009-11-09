@@ -94,7 +94,19 @@ public class UserList implements UserStateListener, UserMessageListener {
             for (int i = 0; i < users.size(); i++) {
                 User user = (User) users.elementAt(i);
                 if (user.getJID().toLowerCase().equals(rightJID.toLowerCase())) {
-                    user.addMessageToHistory(message, fromJID, true);
+                    if (message.length() > 70) {
+                        int oldIndex = 0;
+                        int index = message.indexOf("\n", oldIndex + 60);
+                        while(index > 0){
+                            String sub = message.substring(oldIndex, index);
+                            user.addMessageToHistory(sub, fromJID, true);
+                            oldIndex = index;
+                            index = message.indexOf("\n", oldIndex + 60);
+                        }
+                        user.addMessageToHistory(message.substring(oldIndex), fromJID, true);
+                    } else {
+                        user.addMessageToHistory(message, fromJID, true);
+                    }
                     return;
                 }
             }
@@ -209,5 +221,4 @@ public class UserList implements UserStateListener, UserMessageListener {
         }
         return true;
     }
-    
 }
