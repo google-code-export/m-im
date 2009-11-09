@@ -162,6 +162,11 @@ public class StaticRichText implements ItemInterface {
             if (font.getHeight() > lineHeight) {
                 lineHeight = font.getHeight();
             }
+            if (slice.endsWith("\n")) {
+                currentHeight += lineHeight;
+                currentWidth = 0;
+                lineHeight = 0;
+            }
         }
     }
 

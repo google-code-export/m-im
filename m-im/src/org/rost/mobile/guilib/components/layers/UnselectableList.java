@@ -25,6 +25,14 @@ public class UnselectableList extends LayerInterface {
     public UnselectableList() {
     }
     int height = 0;
+
+    public int getCurrentHeight() {
+        return currentHeight;
+    }
+
+    public int getHeight() {
+        return height;
+    }
     int activeY = 0;
     int currentPosition = 0;
     int currentHeight = 0;

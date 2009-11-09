@@ -23,7 +23,7 @@ public class TextSplitter {
 
     public TextSplitter() {
     }
-    static String delims = ",.\n:-+;!? ";
+    static String delims = ",.:-+;!? ";
 
     /*
      * This method requires a unit test as it's throwing lots of ArrayIndexOutOfBoundsExceptions in the Nokia 6230i emulator
@@ -35,7 +35,12 @@ public class TextSplitter {
             try {
                 final char currentChar = str.charAt(i);
                 final char nextChar = i + 1 < str.length() ? str.charAt(i + 1) : '\0';
-                if (canSplit(currentChar, nextChar) || i == str.length() - 1) {
+                if (currentChar == '\n') {
+                    int k = i + 1;
+                    String slice = str.substring(lastIndex, k);
+                    lastIndex = k;
+                    v.addElement(slice);
+                } else if (canSplit(currentChar, nextChar) || i == str.length() - 1) {
                     int k = i + 1;
                     if (k < str.length()) {
                         while (str.charAt(k) == ' ' && k < str.length()) {
